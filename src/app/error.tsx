@@ -30,8 +30,9 @@ export default function Error({
       </div>
 
       <button
+        type="button"
         onClick={() => reset()}
-        className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(139,92,246,0.3)]"
+        className="flex items-center gap-2 bg-violet-700 hover:bg-violet-600 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-[0_0_24px_rgba(76,29,149,0.35)]"
       >
         <RefreshCcw className="w-5 h-5" />
         Force Re-render

@@ -62,7 +62,7 @@ body {
 }
 
 .btn-primary {
-  @apply bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-full font-semibold transition-all flex items-center gap-2;
+  @apply bg-violet-700 hover:bg-violet-600 text-white px-6 py-2.5 rounded-full font-semibold transition-all flex items-center gap-2;
 }
 
 .btn-outline {
@@ -84,4 +84,22 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #8b5cf6;
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.35);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

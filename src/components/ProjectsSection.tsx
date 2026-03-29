@@ -70,7 +70,7 @@ export default function ProjectsSection() {
 
               <div className="flex items-center gap-2 mb-8 bg-primary/5 px-4 py-3 rounded-xl border border-primary/10">
                 <Terminal className="w-4 h-4 text-primary" />
-                <span className="text-xs font-mono text-primary/80 font-semibold">{proj.metrics}</span>
+                <span className="text-xs font-mono text-violet-200 font-semibold">{proj.metrics}</span>
               </div>
 
               <div className={`flex flex-wrap gap-2 mb-8 ${i % 2 !== 0 ? 'lg:justify-end' : ''}`}>

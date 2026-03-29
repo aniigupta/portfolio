@@ -1,8 +1,28 @@
 "use client";
 import { motion } from "framer-motion";
-import { GitBranch, GitCommit, GitPullRequest, Github, Star, GitFork } from "lucide-react";
+import Image from "next/image";
+import { GitBranch, GitCommit, Github, Star, GitFork } from "lucide-react";
 
-export default function GithubActivityUI({ userData, repos }: { userData: any, repos: any[] }) {
+type GithubUser = {
+  avatar_url: string;
+  html_url: string;
+  login: string;
+  name: string | null;
+  public_repos: number;
+  followers: number;
+};
+
+type GithubRepo = {
+  id: number;
+  html_url: string;
+  name: string;
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+};
+
+export default function GithubActivityUI({ userData, repos }: { userData: GithubUser; repos: GithubRepo[] }) {
   if (!userData) return null;
 
   return (
@@ -23,7 +43,7 @@ export default function GithubActivityUI({ userData, repos }: { userData: any, r
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -z-10 group-hover:bg-primary/20 transition-colors"></div>
           <div className="flex items-center gap-4 mb-8">
-            <img src={userData.avatar_url} alt="GitHub Avatar" className="w-16 h-16 rounded-full border border-white/10" />
+            <Image src={userData.avatar_url} alt={`${userData.login} GitHub avatar`} width={64} height={64} unoptimized className="w-16 h-16 rounded-full border border-white/10" />
             <div>
               <h3 className="font-bold text-xl">{userData.name || userData.login}</h3>
               <a href={userData.html_url} target="_blank" rel="noreferrer" className="text-muted-foreground text-sm hover:text-primary transition-colors">@{userData.login}</a>
@@ -53,7 +73,7 @@ export default function GithubActivityUI({ userData, repos }: { userData: any, r
           </h3>
           
           <div className="grid sm:grid-cols-2 gap-4">
-            {repos.map((repo, i) => (
+            {repos.map((repo) => (
               <a 
                 key={repo.id} 
                 href={repo.html_url} 

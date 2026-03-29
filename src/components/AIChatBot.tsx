@@ -56,6 +56,8 @@ export default function AIChatBot() {
       <AnimatePresence>
         {!isOpen && (
           <motion.button
+            type="button"
+            aria-label="Open AI chat assistant"
             className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-[0_10px_40px_rgba(139,92,246,0.4)] z-50 hover:scale-110 active:scale-95 transition-transform"
             onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
@@ -63,8 +65,8 @@ export default function AIChatBot() {
             exit={{ scale: 0, opacity: 0 }}
             whileHover={{ y: -5 }}
           >
-            <MessageSquare className="text-white w-6 h-6" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-[#030014] animate-pulse"></span>
+            <MessageSquare className="text-white w-6 h-6" aria-hidden="true" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-[#030014] animate-pulse" aria-hidden="true"></span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -78,6 +80,8 @@ export default function AIChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.9, transition: { duration: 0.2 } }}
             style={{ height: '500px', maxHeight: '80vh' }}
+            role="dialog"
+            aria-labelledby="ai-chat-title"
           >
             {/* Header */}
             <div className="bg-primary/10 border-b border-primary/20 p-4 flex justify-between items-center shrink-0">
@@ -87,11 +91,13 @@ export default function AIChatBot() {
                   <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-green-500 border border-[#0a0a1a]"></span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm text-white flex items-center gap-1">Ask AI <Sparkles className="w-3 h-3 text-yellow-400" /></h4>
+                  <h3 id="ai-chat-title" className="font-bold text-sm text-white flex items-center gap-1">Ask AI <Sparkles className="w-3 h-3 text-yellow-400" /></h3>
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Online</p>
                 </div>
               </div>
               <button 
+                type="button"
+                aria-label="Close AI chat assistant"
                 onClick={() => setIsOpen(false)}
                 className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
               >
@@ -134,7 +140,10 @@ export default function AIChatBot() {
             {/* Input Area */}
             <div className="p-4 bg-white/5 border-t border-white/5 shrink-0">
               <div className="relative flex items-center">
+                <label htmlFor="chat-message" className="sr-only">Type your message</label>
                 <input
+                  id="chat-message"
+                  name="chat-message"
                   type="text"
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
@@ -143,6 +152,8 @@ export default function AIChatBot() {
                   className="w-full bg-[#030014] border border-white/10 rounded-full py-3 pl-4 pr-12 text-sm outline-none focus:border-primary/50 transition-colors placeholder:text-gray-600"
                 />
                 <button 
+                  type="button"
+                  aria-label="Send message"
                   onClick={handleSend}
                   disabled={!inputVal.trim() || isTyping}
                   className="absolute right-2 w-8 h-8 rounded-full bg-primary/20 hover:bg-primary text-primary hover:text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:hover:bg-primary/20 disabled:hover:text-primary"

@@ -166,7 +166,7 @@ export default function AboutSection() {
                   {"★★★★★".split("").map((s, i) => <span key={i} className="text-[10px] truncate">{s}</span>)}
                 </div>
               </div>
-              <a href="/Aniket_Gupta_FSD_.pdf" download="Aniket_Gupta_FSD_.pdf" className="w-full bg-primary hover:bg-primary/90 text-white py-3.5 rounded-2xl font-bold transition-all mt-4 flex items-center justify-center gap-2 group hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+              <a href="/Aniket_Gupta_FSD_.pdf" download="Aniket_Gupta_FSD_.pdf" className="w-full bg-violet-700 hover:bg-violet-600 text-white py-3.5 rounded-2xl font-bold transition-all mt-4 flex items-center justify-center gap-2 group hover:shadow-[0_0_24px_rgba(76,29,149,0.35)]">
                 Download Resume
                 <Download className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
               </a>

@@ -6,7 +6,7 @@ import { ChevronRight, Download, Github, Linkedin, Mail } from "lucide-react";
 export default function InteractiveHero() {
   const [terminalText, setTerminalText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
-  
+
   const fullText = "Hi, I'm Aniket... I engineer scalable web apps and AI-integrated systems. I don't just build websites; I build intelligent digital products.";
 
   useEffect(() => {
@@ -57,9 +57,9 @@ export default function InteractiveHero() {
           <span className="text-[10px] text-muted-foreground ml-2 font-sans font-medium">aniket@ai-portfolio: ~</span>
         </div>
         <div className="mt-8 text-sm md:text-base text-gray-300 min-h-[60px] flex gap-2 relative">
-          <span className="text-primary font-bold">❯</span>
+          <span className="text-primary font-bold">&gt;</span>
           <div className="leading-relaxed">
-            {/* SSR Sizing Fallback: Forces browser to calculate layout before JS hydration to fix LCP */}
+            {/* SSR Sizing fallback keeps layout stable before hydration. */}
             <span className="opacity-0 pointer-events-none absolute inset-0" aria-hidden="true">
               {fullText}
             </span>
@@ -78,7 +78,7 @@ export default function InteractiveHero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <a href="#projects" className="bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-primary/20 flex items-center gap-2 group hover:scale-105">
+        <a href="#projects" className="bg-violet-700 hover:bg-violet-600 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-violet-900/30 flex items-center gap-2 group hover:scale-105">
           <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           View Case Studies
         </a>

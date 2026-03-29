@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Send, Users, Award, Mail, MapPin, Github, Linkedin, CalendarCheck, FilePlus, Code } from "lucide-react";
+import { Send, Users, Mail, MapPin, Github, Linkedin, CalendarCheck, FilePlus, Code } from "lucide-react";
 
 export default function ContactSection() {
   return (
@@ -24,7 +24,7 @@ export default function ContactSection() {
                   <p className="text-xs text-muted-foreground mt-1">Schedule a 15-min discovery call</p>
                 </div>
               </div>
-              <span className="text-primary font-bold">→</span>
+              <span className="text-primary font-bold">-&gt;</span>
             </a>
 
             <a href="mailto:aniiigupta23@gmail.com?subject=Hire Me Inquiry" className="glass-card p-6 rounded-3xl border border-white/10 hover:border-primary/50 hover:-translate-y-1 transition-all flex items-center justify-between group shadow-lg">
@@ -37,7 +37,7 @@ export default function ContactSection() {
                   <p className="text-xs text-muted-foreground mt-1">Full-Time / Contract opportunities</p>
                 </div>
               </div>
-              <span className="text-primary font-bold">→</span>
+              <span className="text-primary font-bold">-&gt;</span>
             </a>
 
             <a href="mailto:aniiigupta23@gmail.com?subject=Freelance Project" className="glass-card p-6 rounded-3xl border border-white/10 hover:border-primary/50 hover:-translate-y-1 transition-all flex items-center justify-between group shadow-lg">
@@ -47,10 +47,10 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h3 className="font-bold text-white group-hover:text-primary transition-colors">Freelance Project</h3>
-                  <p className="text-xs text-muted-foreground mt-1">Let's build your next SaaS MVP</p>
+                  <p className="text-xs text-muted-foreground mt-1">Let&apos;s build your next SaaS MVP</p>
                 </div>
               </div>
-              <span className="text-primary font-bold">→</span>
+              <span className="text-primary font-bold">-&gt;</span>
             </a>
           </motion.div>
 
@@ -85,14 +85,14 @@ export default function ContactSection() {
         </div>
 
         <div className="lg:col-span-7">
-          <motion.form 
+          <motion.form
             className="glass-card p-10 md:p-12 rounded-[2.5rem] space-y-8 relative overflow-hidden"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full pointer-events-none -z-10"></div>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-3 relative z-10">
                 <label htmlFor="name" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Name</label>
@@ -109,20 +109,23 @@ export default function ContactSection() {
                 </div>
               </div>
             </div>
+
             <div className="space-y-3 relative z-10">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Subject</label>
-              <select className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 px-6 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all appearance-none text-white font-medium shadow-inner hover:-translate-y-1 duration-300 cursor-pointer">
+              <label htmlFor="workType" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Subject</label>
+              <select id="workType" name="workType" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 px-6 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all appearance-none text-white font-medium shadow-inner hover:-translate-y-1 duration-300 cursor-pointer">
                 <option value="project">SaaS MVP Concept</option>
                 <option value="job">Full-Time Opportunity</option>
                 <option value="freelance">Freelance Contract</option>
                 <option value="general">General Networking</option>
               </select>
             </div>
+
             <div className="space-y-3 relative z-10">
-              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Message</label>
-              <textarea rows={5} placeholder="Let me know how I can help..." className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-6 px-6 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all resize-none font-medium placeholder:text-gray-600 shadow-inner hover:-translate-y-1 duration-300"></textarea>
+              <label htmlFor="message" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Message</label>
+              <textarea id="message" name="message" rows={5} placeholder="Let me know how I can help..." className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-6 px-6 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all resize-none font-medium placeholder:text-gray-600 shadow-inner hover:-translate-y-1 duration-300"></textarea>
             </div>
-            <button className="w-full bg-primary hover:bg-primary/90 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-[0_15px_40px_rgba(139,92,246,0.25)] flex items-center justify-center gap-3 active:scale-[0.98] group hover:scale-[1.02] relative z-10">
+
+            <button type="submit" className="w-full bg-violet-700 hover:bg-violet-600 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-[0_15px_40px_rgba(76,29,149,0.35)] flex items-center justify-center gap-3 active:scale-[0.98] group hover:scale-[1.02] relative z-10">
               Deploy Your Idea
               <Send className="w-5 h-5 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-300" />
             </button>

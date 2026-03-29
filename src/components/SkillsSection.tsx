@@ -41,7 +41,7 @@ export default function SkillsSection() {
               <cat.icon className="w-6 h-6" />
             </div>
             
-            <h4 className="text-xl font-bold mb-6">{cat.label}</h4>
+            <h3 className="text-xl font-bold mb-6">{cat.label}</h3>
             <div className="flex flex-wrap gap-2 relative z-10">
               {cat.skills.map((s, idx) => (
                 <motion.span 
