@@ -27,7 +27,7 @@ export default function InteractiveHero() {
   return (
     <section className="min-h-[90vh] flex flex-col items-center justify-center text-center mb-32 pt-20 relative overflow-visible">
       {/* Spline 3D Scene Container - Now Full Screen Background */}
-      <div className="absolute inset-0 z-0 opacity-60 lg:opacity-80 pointer-events-none">
+      <div className="hidden lg:block absolute inset-0 z-0 opacity-80 pointer-events-none">
         <SplineScene />
       </div>
 

@@ -5,8 +5,8 @@ export default function Footer() {
     <footer className="py-20 border-t border-white/5 bg-[#030014]/80 backdrop-blur-sm relative overflow-hidden mt-40">
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/5 blur-[100px] rounded-full pointer-events-none -z-10"></div>
       
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-10">
-        <div className="flex flex-col items-center md:items-start group">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center group">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 relative rounded-xl overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.3)] group-hover:scale-110 transition-transform">
               <Image src="/profile.png" alt="Aniket Profile" fill className="object-cover object-top" />
@@ -18,10 +18,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="flex gap-10 text-sm font-bold uppercase tracking-widest text-muted-foreground">
-          <a href="#" className="hover:text-primary transition-colors hover:-translate-y-1 block">Privacy Policy</a>
-          <a href="#" className="hover:text-primary transition-colors hover:-translate-y-1 block">Terms of Service</a>
-        </div>
+
       </div>
     </footer>
   );
