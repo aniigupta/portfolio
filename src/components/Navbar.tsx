@@ -31,20 +31,24 @@ export default function Navbar() {
           <span className="font-black text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-primary group-hover:to-purple-300 transition-colors">Aniket Gupta</span>
         </button>
 
-        <div className="hidden md:flex items-center gap-8 bg-white/5 px-6 py-2.5 rounded-full border border-white/5 backdrop-blur-md shadow-inner">
-          <Link href="#projects" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors relative group">
+        <div className="hidden md:flex items-center gap-8 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)]">
+          <Link href="#projects" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
             Projects
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href="#about" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors relative group">
+          <Link href="#about" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
             Experience
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href="/Aniket_Gupta_FSD_.pdf" target="_blank" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors relative group">
+          <Link href="#ai-workflows" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
+            AI Workflows
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+          </Link>
+          <Link href="/Resume_Aniket_2025.pdf" target="_blank" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
             Resume
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href="#contact" className="text-sm font-semibold text-gray-300 hover:text-white transition-colors relative group">
+          <Link href="#contact" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
             Contact
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>

@@ -18,7 +18,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="flex gap-10 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="flex gap-10 text-sm font-bold uppercase tracking-widest text-muted-foreground">
           <a href="#" className="hover:text-primary transition-colors hover:-translate-y-1 block">Privacy Policy</a>
           <a href="#" className="hover:text-primary transition-colors hover:-translate-y-1 block">Terms of Service</a>
         </div>

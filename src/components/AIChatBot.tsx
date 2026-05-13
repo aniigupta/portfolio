@@ -92,7 +92,7 @@ export default function AIChatBot() {
                 </div>
                 <div>
                   <h3 id="ai-chat-title" className="font-bold text-sm text-white flex items-center gap-1">Ask AI <Sparkles className="w-3 h-3 text-yellow-400" /></h3>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Online</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold">Online</p>
                 </div>
               </div>
               <button 

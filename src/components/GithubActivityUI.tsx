@@ -28,7 +28,7 @@ export default function GithubActivityUI({ userData, repos }: { userData: Github
   return (
     <section className="mb-40 pt-10">
       <motion.div className="mb-12" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-        <span className="text-primary font-bold tracking-widest text-[10px] uppercase block mb-3 flex items-center gap-2">
+        <span className="text-primary font-bold tracking-widest text-xs uppercase block mb-3 flex items-center gap-2">
           <Github className="w-3 h-3" /> Live Statistics
         </span>
         <h2 className="text-4xl md:text-5xl font-black mb-6">GitHub Activity</h2>
@@ -53,11 +53,11 @@ export default function GithubActivityUI({ userData, repos }: { userData: Github
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
               <span className="block text-2xl font-black text-white mb-1">{userData.public_repos}</span>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Repositories</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Repositories</span>
             </div>
             <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
               <span className="block text-2xl font-black text-white mb-1">{userData.followers}</span>
-              <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Followers</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Followers</span>
             </div>
           </div>
         </motion.div>
@@ -85,8 +85,8 @@ export default function GithubActivityUI({ userData, repos }: { userData: Github
                   <h4 className="font-bold text-white group-hover:text-primary transition-colors truncate pr-4">{repo.name}</h4>
                   <GitFork className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 </div>
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-4 min-h-[32px]">{repo.description || "No description provided."}</p>
-                <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-widest">
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[32px]">{repo.description || "No description provided."}</p>
+                <div className="flex items-center justify-between text-xs uppercase font-bold tracking-widest">
                   <span className="text-primary">{repo.language || "Markdown"}</span>
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1 text-muted-foreground"><Star className="w-3 h-3" /> {repo.stargazers_count}</span>

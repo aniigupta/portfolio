@@ -15,7 +15,7 @@ export default function SkillsSection() {
   return (
     <div className="pt-20 pt-10">
       <motion.div className="mb-16" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-        <span className="text-primary font-bold tracking-widest text-[10px] uppercase block mb-3 flex items-center gap-2">
+        <span className="text-primary font-bold tracking-widest text-xs uppercase block mb-3 flex items-center gap-2">
           <Brain className="w-3 h-3" /> Expertise
         </span>
         <h2 className="text-4xl md:text-5xl font-black">Technical Arsenal</h2>
@@ -46,7 +46,7 @@ export default function SkillsSection() {
               {cat.skills.map((s, idx) => (
                 <motion.span 
                   key={s} 
-                  className="px-3.5 py-1.5 bg-[#030014]/50 border border-white/10 rounded-xl text-xs font-mono font-medium hover:border-primary/50 hover:text-white transition-colors cursor-default"
+                  className="px-3.5 py-1.5 bg-[#030014]/50 border border-white/10 rounded-xl text-sm font-mono font-medium hover:border-primary/50 hover:text-white transition-colors cursor-default"
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.1 + (idx * 0.05) }}

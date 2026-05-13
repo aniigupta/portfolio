@@ -9,12 +9,13 @@ export default function AboutSection() {
       title: "Full Stack Developer",
       company: "Anarish Innovations Pvt. Ltd.",
       period: "Feb 2026 - Present",
-      tags: ["Next.js", "Angular", "React", "Tailwind CSS", "PostgreSQL", "Strapi CMS", "Docker", "Railway"],
+      tags: ["Next.js", "Angular", "Node.js", "PostgreSQL", "Strapi CMS", "Docker", "Railway", "Cloudinary"],
       points: [
-        "Built and shipped full-stack features using Next.js, Angular, React and Tailwind CSS with pixel-perfect, Figma-to-code implementation.",
-        "Designed and managed PostgreSQL schemas and integrated Strapi CMS for dynamic content workflows, reducing content update time significantly.",
-        "Containerized applications with Docker and deployed to Railway, streamlining CI/CD and reducing deployment friction.",
-        "Configured Cloudinary for media management across multiple projects."
+        "Engineered and deployed scalable full-stack web applications using Next.js, Angular, and Node.js, delivering responsive, pixel-perfect UI from Figma designs.",
+        "Built a comprehensive IMS SaaS platform featuring inventory tracking, RBAC, analytics dashboards, order workflows, and billing modules.",
+        "Architected and optimized PostgreSQL database schemas while integrating Strapi CMS for dynamic content management, improving system maintainability.",
+        "Integrated Cloudinary for secure media handling, real-time transformations, and CDN-based performance enhancements across production environments.",
+        "Containerized applications with Docker and managed deployments on Railway, streamlining CI/CD pipelines and enhancing deployment reliability."
       ]
     },
     {
@@ -34,7 +35,7 @@ export default function AboutSection() {
   return (
     <section id="about" className="mb-40 pt-20">
       <motion.div className="mb-16" initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-        <span className="text-primary font-bold tracking-widest text-[10px] uppercase block mb-3">Behind the Code</span>
+        <span className="text-primary font-bold tracking-widest text-xs uppercase block mb-3">Behind the Code</span>
         <h2 className="text-4xl md:text-5xl font-black">How I Think & Build</h2>
       </motion.div>
 
@@ -57,7 +58,7 @@ export default function AboutSection() {
               <item.icon className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+            <p className="text-gray-300 text-sm leading-relaxed">{item.desc}</p>
           </motion.div>
         ))}
       </div>
@@ -86,9 +87,9 @@ export default function AboutSection() {
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-xl md:text-2xl font-bold mb-1 group-hover:text-primary transition-colors">{job.title}</h3>
-                    <p className="text-muted-foreground font-medium">{job.company}</p>
+                    <p className="text-gray-300 font-medium">{job.company}</p>
                   </div>
-                  <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] font-mono font-bold text-primary whitespace-nowrap">
+                  <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-xs font-mono font-bold text-primary whitespace-nowrap">
                     {job.period}
                   </span>
                 </div>
@@ -102,7 +103,7 @@ export default function AboutSection() {
                 </ul>
                 <div className="flex flex-wrap gap-2">
                   {job.tags.map(tag => (
-                    <span key={tag} className="px-3 py-1 bg-[#030014]/50 border border-white/10 rounded-lg text-[10px] font-mono hover:text-primary transition-colors cursor-default">
+                    <span key={tag} className="px-3 py-1 bg-[#030014]/50 border border-white/10 rounded-lg text-xs font-mono hover:text-primary transition-colors cursor-default">
                       {tag}
                     </span>
                   ))}
@@ -142,12 +143,12 @@ export default function AboutSection() {
               </div>
               <div>
                 <h3 className="font-bold text-lg leading-tight text-white">B.Tech in IIoT</h3>
-                <p className="text-xs text-muted-foreground">USAR, Delhi | 2021 - 2025</p>
+                <p className="text-sm text-gray-300">USAR, Delhi | 2021 - 2025</p>
               </div>
             </div>
             <div className="space-y-6">
               <div className="flex justify-between items-end border-b border-white/5 pb-4">
-                <span className="text-muted-foreground font-medium text-sm tracking-widest">CGPA</span>
+                <span className="text-gray-300 font-medium text-sm tracking-widest">CGPA</span>
                 <span className="text-2xl font-black text-white">7.87</span>
               </div>
               <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5 group hover:border-primary/30 transition-all shadow-inner">
@@ -163,10 +164,10 @@ export default function AboutSection() {
                   <span className="text-sm font-semibold">HackerRank</span>
                 </div>
                 <div className="flex gap-1 text-primary">
-                  {"★★★★★".split("").map((s, i) => <span key={i} className="text-[10px] truncate">{s}</span>)}
+                  {"★★★★★".split("").map((s, i) => <span key={i} className="text-xs truncate">{s}</span>)}
                 </div>
               </div>
-              <a href="/Aniket_Gupta_FSD_.pdf" download="Aniket_Gupta_FSD_.pdf" className="w-full bg-violet-700 hover:bg-violet-600 text-white py-3.5 rounded-2xl font-bold transition-all mt-4 flex items-center justify-center gap-2 group hover:shadow-[0_0_24px_rgba(76,29,149,0.35)]">
+              <a href="/Resume_Aniket_2025.pdf" download="Resume_Aniket_2025.pdf" className="w-full bg-violet-700 hover:bg-violet-600 text-white py-3.5 rounded-2xl font-bold transition-all mt-4 flex items-center justify-center gap-2 group hover:shadow-[0_0_24px_rgba(76,29,149,0.35)]">
                 Download Resume
                 <Download className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
               </a>

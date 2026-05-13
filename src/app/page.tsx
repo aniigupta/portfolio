@@ -1,11 +1,12 @@
 import dynamic from "next/dynamic";
 import Navbar from "../components/Navbar";
 import InteractiveHero from "../components/InteractiveHero";
-import GithubActivity from "../components/GithubActivity";
+
 
 // Dynamic Imports for below-the-fold content to drastically improve LCP & TTFB
 const AboutSection = dynamic(() => import("../components/AboutSection"));
 const ProjectsSection = dynamic(() => import("../components/ProjectsSection"));
+const AIWorkflowsSection = dynamic(() => import("../components/AIWorkflowsSection"));
 const SkillsSection = dynamic(() => import("../components/SkillsSection"));
 const PerformanceSection = dynamic(() => import("../components/PerformanceSection"));
 const ContactSection = dynamic(() => import("../components/ContactSection"));
@@ -34,9 +35,10 @@ export default function Home() {
         <InteractiveHero />
         
         {/* Below the fold (lazy loaded) */}
-        <GithubActivity />
+
         <AboutSection />
         <ProjectsSection />
+        <AIWorkflowsSection />
         <SkillsSection />
         <PerformanceSection />
         <ContactSection />

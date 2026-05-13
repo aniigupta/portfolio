@@ -49,7 +49,7 @@ const LighthouseRing = () => {
         <span className="text-4xl font-black text-[#00e676] tracking-tighter shadow-green-500/50 drop-shadow-md">
           <AnimatedCounter value={98} duration={2.5} />
         </span>
-        <span className="text-[10px] font-bold tracking-widest text-[#00e676] uppercase">Performance</span>
+        <span className="text-xs font-bold tracking-widest text-[#00e676] uppercase">Performance</span>
       </div>
     </div>
   );
@@ -92,13 +92,13 @@ export default function PerformanceSection() {
             initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
             <span className="text-5xl font-black text-white mb-2"><AnimatedCounter value={40} suffix="%" />⬇</span>
             <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Smaller JS Payloads</span>
-            <p className="text-xs text-gray-400 mt-4 leading-relaxed">Achieved via aggressive dynamic importing and strict bundle analysis.</p>
+            <p className="text-sm text-gray-400 mt-4 leading-relaxed">Achieved via aggressive dynamic importing and strict bundle analysis.</p>
           </motion.div>
           <motion.div className="glass-card p-8 rounded-3xl border border-white/5 border-t-primary/30 flex flex-col justify-center" 
             initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
             <span className="text-5xl font-black text-white mb-2 flex items-baseline gap-1">1.2<span className="text-2xl">s</span></span>
             <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Average LCP Time</span>
-            <p className="text-xs text-gray-400 mt-4 leading-relaxed">Prioritizing critical above-the-fold assets to paint near-instantly on mobile.</p>
+            <p className="text-sm text-gray-400 mt-4 leading-relaxed">Prioritizing critical above-the-fold assets to paint near-instantly on mobile.</p>
           </motion.div>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function PerformanceSection() {
         <div className="grid md:grid-cols-2 gap-0 rounded-4xl overflow-hidden border border-white/10 shadow-2xl relative">
           
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-background border border-white/10 items-center justify-center z-10 hidden md:flex">
-            <span className="text-xs font-black text-muted-foreground">VS</span>
+            <span className="text-sm font-black text-muted-foreground">VS</span>
           </div>
 
           <div className="bg-[#0f0a0a] p-10 md:p-14 relative overflow-hidden group">
@@ -168,7 +168,7 @@ export default function PerformanceSection() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-white/10 text-xs uppercase tracking-widest text-gray-500">
+                  <tr className="border-b border-white/10 text-sm uppercase tracking-widest text-gray-500">
                     <th className="py-4 px-6 font-bold w-1/2">Metric (Google Web Vitals)</th>
                     <th className="py-4 px-6 font-bold text-center">Standard Build</th>
                     <th className="py-4 px-6 font-bold text-[#00e676] text-center">Engineered Result</th>
@@ -206,7 +206,7 @@ export default function PerformanceSection() {
               initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
               <vec.icon className="w-6 h-6 text-[#00e676] mb-4 group-hover:scale-110 transition-transform" />
               <h4 className="font-bold mb-2">{vec.title}</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">{vec.desc}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{vec.desc}</p>
             </motion.div>
           ))}
         </div>
