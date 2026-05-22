@@ -1,6 +1,6 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Users, Mail, MapPin, Github, Linkedin, CalendarCheck, Code, ChevronDown, Check } from "lucide-react";
+import { Send, Users, Mail, MapPin, Github, Linkedin, CalendarCheck, Code, ChevronDown, Check, X, AlertCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 export default function ContactSection() {
@@ -8,6 +8,7 @@ export default function ContactSection() {
   const [selectedSubject, setSelectedSubject] = useState("Full-Time Opportunity");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [toast, setToast] = useState<{ show: boolean; type: "success" | "error"; message: string } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const subjects = [
@@ -25,6 +26,15 @@ export default function ContactSection() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (toast && toast.show) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,15 +60,32 @@ export default function ContactSection() {
         setStatus("success");
         (e.target as HTMLFormElement).reset();
         setSelectedSubject("Full-Time Opportunity");
+        setToast({
+          show: true,
+          type: "success",
+          message: "Thank you! Your message has been sent successfully."
+        });
       } else {
         const errorData = await response.json();
-        setErrorMessage(errorData.error || "Something went wrong.");
+        const msg = errorData.error || "Something went wrong.";
+        setErrorMessage(msg);
         setStatus("error");
+        setToast({
+          show: true,
+          type: "error",
+          message: msg
+        });
       }
     } catch (err) {
       console.error(err);
-      setErrorMessage("Connection error. Please try again.");
+      const msg = "Connection error. Please try again.";
+      setErrorMessage(msg);
       setStatus("error");
+      setToast({
+        show: true,
+        type: "error",
+        message: msg
+      });
     }
   };
 
@@ -233,6 +260,45 @@ export default function ContactSection() {
           </motion.form>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toast && toast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9, transition: { duration: 0.2 } }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-4 bg-[#0d0d1a]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(139,92,246,0.15)] max-w-sm"
+          >
+            <div className={`p-2.5 rounded-xl border flex items-center justify-center ${
+              toast.type === "success" 
+                ? "bg-green-500/10 border-green-500/30 text-green-400" 
+                : "bg-red-500/10 border-red-500/30 text-red-400"
+            }`}>
+              {toast.type === "success" ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                <AlertCircle className="w-5 h-5" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-white text-sm">
+                {toast.type === "success" ? "Message Sent!" : "Error Sending Message"}
+              </h4>
+              <p className="text-gray-300 text-xs mt-0.5 leading-relaxed">
+                {toast.message}
+              </p>
+            </div>
+            <button 
+              type="button"
+              onClick={() => setToast(null)} 
+              className="p-1 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/5 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CursorGlow() {
+  const [mounted, setMounted] = useState(false);
+
   // High-performance Framer Motion values (bypasses React Render Cycle entirely to fix INP)
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
@@ -18,6 +20,8 @@ export default function CursorGlow() {
   const bgY = useSpring(cursorY, bgSpringConfig);
 
   useEffect(() => {
+    setMounted(true);
+
     const updateMousePosition = (e: MouseEvent) => {
       // Direct variable mutation! No React re-rendering triggered.
       cursorX.set(e.clientX);
@@ -28,7 +32,7 @@ export default function CursorGlow() {
     return () => window.removeEventListener("mousemove", updateMousePosition);
   }, [cursorX, cursorY]);
 
-  if (typeof window === "undefined") return null;
+  if (!mounted) return null;
 
   return (
     <>

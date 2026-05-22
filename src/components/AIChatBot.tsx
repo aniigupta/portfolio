@@ -6,6 +6,7 @@ import { MessageSquare, X, Send, Bot, User, Sparkles } from "lucide-react";
 type Message = { id: number; text: string; sender: "bot" | "user" };
 
 export default function AIChatBot() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, text: "Hi! I'm Aniket's AI assistant. Want to know about his tech stack, experience, or latest projects?", sender: "bot" }
@@ -19,8 +20,16 @@ export default function AIChatBot() {
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      scrollToBottom();
+    }
+  }, [messages, isTyping, mounted]);
+
+  if (!mounted) return null;
 
   const handleSend = async () => {
     if (!inputVal.trim()) return;
