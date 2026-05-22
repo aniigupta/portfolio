@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from "react";
 export default function ContactSection() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState("Full-Time Opportunity");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const subjects = [
@@ -23,6 +25,42 @@ export default function ContactSection() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMessage("");
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      workType: formData.get("workType"),
+      message: formData.get("message"),
+    };
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        (e.target as HTMLFormElement).reset();
+        setSelectedSubject("Full-Time Opportunity");
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.error || "Something went wrong.");
+        setStatus("error");
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Connection error. Please try again.");
+      setStatus("error");
+    }
+  };
 
   return (
     <section id="contact" className="mb-40 pt-20">
@@ -94,6 +132,7 @@ export default function ContactSection() {
 
         <div className="lg:col-span-7">
           <motion.form
+            onSubmit={handleSubmit}
             className="glass-card p-10 md:p-12 rounded-[2.5rem] space-y-8 relative overflow-hidden"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -106,14 +145,14 @@ export default function ContactSection() {
                 <label htmlFor="name" className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Name</label>
                 <div className="relative group hover:-translate-y-1 transition-transform duration-300">
                   <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
-                  <input id="name" name="name" type="text" autoComplete="name" placeholder="John Doe" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
+                  <input required id="name" name="name" type="text" autoComplete="name" placeholder="John Doe" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
                 </div>
               </div>
               <div className="space-y-3 relative z-10">
                 <label htmlFor="email" className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Email</label>
                 <div className="relative group hover:-translate-y-1 transition-transform duration-300">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
-                  <input id="email" name="email" type="email" autoComplete="email" placeholder="john@example.com" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
+                  <input required id="email" name="email" type="email" autoComplete="email" placeholder="john@example.com" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
                 </div>
               </div>
             </div>
@@ -167,12 +206,29 @@ export default function ContactSection() {
 
             <div className="space-y-3 relative z-10">
               <label htmlFor="message" className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Message</label>
-              <textarea id="message" name="message" rows={5} placeholder="Let me know how I can help..." className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-6 px-6 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all resize-none font-medium placeholder:text-gray-600 shadow-inner hover:-translate-y-1 duration-300"></textarea>
+              <textarea required id="message" name="message" rows={5} placeholder="Let me know how I can help..." className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-6 px-6 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all resize-none font-medium placeholder:text-gray-600 shadow-inner hover:-translate-y-1 duration-300"></textarea>
             </div>
 
-            <button type="submit" className="w-full bg-violet-700 hover:bg-violet-600 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-[0_15px_40px_rgba(76,29,149,0.35)] flex items-center justify-center gap-3 active:scale-[0.98] group hover:scale-[1.02] relative z-10">
-              Deploy Your Idea
-              <Send className="w-5 h-5 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-300" />
+            <div className="min-h-[20px]">
+              {status === "success" && (
+                <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-green-400 font-bold text-sm text-center">
+                  Message sent! I&apos;ll get back to you shortly.
+                </motion.p>
+              )}
+              {status === "error" && (
+                <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-400 font-bold text-sm text-center">
+                  {errorMessage}
+                </motion.p>
+              )}
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={status === "loading"}
+              className={`w-full bg-violet-700 hover:bg-violet-600 text-white py-5 rounded-2xl font-black text-lg transition-all shadow-[0_15px_40px_rgba(76,29,149,0.35)] flex items-center justify-center gap-3 active:scale-[0.98] group hover:scale-[1.02] relative z-10 disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {status === "loading" ? "Deploying..." : "Deploy Your Idea"}
+              <Send className={`w-5 h-5 transition-transform duration-300 ${status === "loading" ? 'animate-pulse' : 'group-hover:translate-x-2 group-hover:-translate-y-2'}`} />
             </button>
           </motion.form>
         </div>
