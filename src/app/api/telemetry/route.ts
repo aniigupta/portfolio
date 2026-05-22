@@ -36,8 +36,24 @@ function formatDuration(seconds: number) {
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
-    const { sessionId, eventType, duration, referrer, screenSize, language, timezone, pathname, name, shouldEmail } = data;
+    let data;
+    try {
+      data = await req.json();
+    } catch (parseError) {
+      console.warn('Telemetry: received request with empty or invalid JSON body.');
+      return NextResponse.json({ error: 'Invalid or empty JSON body' }, { status: 400 });
+    }
+
+    const { sessionId, eventType, duration, referrer, screenSize, language, timezone, pathname, name, shouldEmail } = data || {};
+    
+    const safeSessionId = typeof sessionId === 'string' ? sessionId : 'unknown_session';
+    const safePathname = typeof pathname === 'string' ? pathname : 'unknown_path';
+    const numericDuration = typeof duration === 'number' ? duration : 0;
+    const safeName = typeof name === 'string' ? name : '';
+    const safeReferrer = typeof referrer === 'string' ? referrer : 'Direct / Typed URL';
+    const safeScreenSize = typeof screenSize === 'string' ? screenSize : 'unknown_size';
+    const safeLanguage = typeof language === 'string' ? language : 'unknown_lang';
+    const safeTimezone = typeof timezone === 'string' ? timezone : 'unknown_tz';
 
     const ua = req.headers.get("user-agent") || "";
     
@@ -54,112 +70,117 @@ export async function POST(req: Request) {
 
     const { os, browser, device } = parseUserAgent(ua);
 
-    console.log(`Telemetry Event [${eventType}] from session ${sessionId}: Duration ${duration}s, Path: ${pathname}`);
+    console.log(`Telemetry Event [${eventType || 'unknown'}] from session ${safeSessionId}: Duration ${numericDuration}s, Path: ${safePathname}`);
 
     // If requested and user stayed long enough, send email alert
-    if (shouldEmail && duration >= 5) {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-
-      const visitorNameLabel = name ? name : "Anonymous Visitor";
-      const locationLabel = `${city}, ${region}, ${country}`;
-      const formattedDuration = formatDuration(duration);
-
-      const emailSubject = `[Portfolio View] 👤 ${visitorNameLabel} from ${city}, ${country}`;
-
-      const mailOptions = {
-        from: process.env.SMTP_USER,
-        to: 'aniiigupta23@gmail.com',
-        subject: emailSubject,
-        text: `
-          New Portfolio View Session Summary:
-          
-          Visitor: ${visitorNameLabel}
-          Location: ${locationLabel}
-          Dwell Time: ${formattedDuration}
-          Traffic Source: ${referrer}
-          Exit Path: ${pathname}
-          Device: ${device} (${browser} on ${os})
-          Language: ${language}
-          Timezone: ${timezone}
-          Screen Layout: ${screenSize}
-          IP Address: ${ip}
-        `,
-        html: `
-          <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.03); background: #faf9ff;">
-            <div style="background: linear-gradient(135deg, #7c3aed, #db2777); padding: 24px; text-align: center;">
-              <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">Portfolio View Alert</h2>
-              <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0 0; font-size: 14px; font-family: monospace;">Session ID: ${sessionId.slice(0, 12)}...</p>
-            </div>
-            
-            <div style="padding: 24px; background: #ffffff;">
-              <div style="background: rgba(124, 58, 237, 0.04); border: 1px solid rgba(124, 58, 237, 0.08); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
-                <h3 style="margin-top: 0; color: #7c3aed; font-size: 16px; font-weight: 700;">Visitor Highlights</h3>
-                <table style="width: 100%; font-size: 14px; color: #4b5563; border-collapse: collapse;">
-                  <tr>
-                    <td style="padding: 6px 0; font-weight: 600; color: #1f2937; width: 120px;">Identity:</td>
-                    <td style="padding: 6px 0; font-weight: 700; color: #7c3aed;">${visitorNameLabel}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 6px 0; font-weight: 600; color: #1f2937;">Dwell Time:</td>
-                    <td style="padding: 6px 0; font-weight: 700; color: #10b981;">⏱️ ${formattedDuration}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 6px 0; font-weight: 600; color: #1f2937;">Location:</td>
-                    <td style="padding: 6px 0;">📍 ${locationLabel}</td>
-                  </tr>
-                </table>
-              </div>
-
-              <h4 style="margin: 0 0 10px 0; color: #374151; font-size: 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px;">Technical Details</h4>
-              <table style="width: 100%; font-size: 13px; color: #4b5563; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; color: #4b5563; width: 130px;">Referrer Source:</td>
-                  <td style="padding: 6px 0; font-family: monospace;">${referrer}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Exit Page:</td>
-                  <td style="padding: 6px 0; font-family: monospace;">${pathname}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Device Profile:</td>
-                  <td style="padding: 6px 0;">${device} (${browser} on ${os})</td>
-                </tr>
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">IP Address:</td>
-                  <td style="padding: 6px 0; font-family: monospace; font-size: 12px;">${ip}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Browser Language:</td>
-                  <td style="padding: 6px 0;">${language} (${timezone})</td>
-                </tr>
-                <tr>
-                  <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Screen Layout:</td>
-                  <td style="padding: 6px 0;">${screenSize}</td>
-                </tr>
-              </table>
-            </div>
-            
-            <div style="background: #f3f4f6; text-align: center; padding: 16px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
-              Sent automatically from your Portfolio Webpage.
-            </div>
-          </div>
-        `,
-      };
-
+    if (shouldEmail && numericDuration >= 5) {
       try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Successfully dispatched session alert email for ${sessionId}`);
+        if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+          console.warn('Telemetry Warning: SMTP environment variables are missing from environment. Cannot send email alert.');
+        } else {
+          const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT) || 465,
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS,
+            },
+          });
+
+          const visitorNameLabel = safeName ? safeName : "Anonymous Visitor";
+          const locationLabel = `${city}, ${region}, ${country}`;
+          const formattedDuration = formatDuration(numericDuration);
+          const displaySessionId = safeSessionId.length > 12 ? safeSessionId.slice(0, 12) : safeSessionId;
+
+          const emailSubject = `[Portfolio View] 👤 ${visitorNameLabel} from ${city}, ${country}`;
+
+          const mailOptions = {
+            from: process.env.SMTP_USER,
+            to: 'aniiigupta23@gmail.com',
+            subject: emailSubject,
+            text: `
+              New Portfolio View Session Summary:
+              
+              Visitor: ${visitorNameLabel}
+              Location: ${locationLabel}
+              Dwell Time: ${formattedDuration}
+              Traffic Source: ${safeReferrer}
+              Exit Path: ${safePathname}
+              Device: ${device} (${browser} on ${os})
+              Language: ${safeLanguage}
+              Timezone: ${safeTimezone}
+              Screen Layout: ${safeScreenSize}
+              IP Address: ${ip}
+            `,
+            html: `
+              <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.03); background: #faf9ff;">
+                <div style="background: linear-gradient(135deg, #7c3aed, #db2777); padding: 24px; text-align: center;">
+                  <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">Portfolio View Alert</h2>
+                  <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0 0; font-size: 14px; font-family: monospace;">Session ID: ${displaySessionId}...</p>
+                </div>
+                
+                <div style="padding: 24px; background: #ffffff;">
+                  <div style="background: rgba(124, 58, 237, 0.04); border: 1px solid rgba(124, 58, 237, 0.08); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; color: #7c3aed; font-size: 16px; font-weight: 700;">Visitor Highlights</h3>
+                    <table style="width: 100%; font-size: 14px; color: #4b5563; border-collapse: collapse;">
+                      <tr>
+                        <td style="padding: 6px 0; font-weight: 600; color: #1f2937; width: 120px;">Identity:</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #7c3aed;">${visitorNameLabel}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; font-weight: 600; color: #1f2937;">Dwell Time:</td>
+                        <td style="padding: 6px 0; font-weight: 700; color: #10b981;">⏱️ ${formattedDuration}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; font-weight: 600; color: #1f2937;">Location:</td>
+                        <td style="padding: 6px 0;">📍 ${locationLabel}</td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <h4 style="margin: 0 0 10px 0; color: #374151; font-size: 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px;">Technical Details</h4>
+                  <table style="width: 100%; font-size: 13px; color: #4b5563; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563; width: 130px;">Referrer Source:</td>
+                      <td style="padding: 6px 0; font-family: monospace;">${safeReferrer}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Exit Page:</td>
+                      <td style="padding: 6px 0; font-family: monospace;">${safePathname}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Device Profile:</td>
+                      <td style="padding: 6px 0;">${device} (${browser} on ${os})</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">IP Address:</td>
+                      <td style="padding: 6px 0; font-family: monospace; font-size: 12px;">${ip}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Browser Language:</td>
+                      <td style="padding: 6px 0;">${safeLanguage} (${safeTimezone})</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Screen Layout:</td>
+                      <td style="padding: 6px 0;">${safeScreenSize}</td>
+                    </tr>
+                  </table>
+                </div>
+                
+                <div style="background: #f3f4f6; text-align: center; padding: 16px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
+                  Sent automatically from your Portfolio Webpage.
+                </div>
+              </div>
+            `,
+          };
+
+          await transporter.sendMail(mailOptions);
+          console.log(`Successfully dispatched session alert email for ${safeSessionId}`);
+        }
       } catch (mailError) {
         console.error('Nodemailer Telemetry Email Error:', mailError);
-        // Do not fail the request; allow the client to receive a 200 success response.
+        // We log the error but still return 200 so that client-side pings succeed without console error spam
       }
     }
 

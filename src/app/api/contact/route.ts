@@ -3,18 +3,31 @@ import nodemailer from 'nodemailer';
 
 export async function POST(req: Request) {
   try {
-    const { name, email, workType, message } = await req.json();
+    let data;
+    try {
+      data = await req.json();
+    } catch (parseError) {
+      console.warn('Contact API: received request with empty or invalid JSON body.');
+      return NextResponse.json({ error: 'Invalid or empty JSON body' }, { status: 400 });
+    }
+
+    const { name, email, workType, message } = data || {};
 
     // Validate inputs
     if (!name || !email || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Validate SMTP Env values first
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.error('Contact Form Error: SMTP environment variables (SMTP_HOST, SMTP_USER, SMTP_PASS) are missing from the server environment.');
+      return NextResponse.json({ error: 'Server email credentials are not configured.' }, { status: 500 });
+    }
+
     // Configure the transporter
-    // Note: These env variables must be set in your .env.local file
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
+      port: Number(process.env.SMTP_PORT) || 465,
       secure: process.env.SMTP_SECURE === 'true',
       auth: {
         user: process.env.SMTP_USER,
