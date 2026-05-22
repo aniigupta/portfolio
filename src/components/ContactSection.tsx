@@ -86,12 +86,26 @@ export default function ContactSection() {
     setStatus("loading");
     setErrorMessage("");
 
+    let sessionDuration = 0;
+    if (typeof window !== "undefined") {
+      const startTimeStr = sessionStorage.getItem("portfolio_sess_start");
+      if (startTimeStr) {
+        const startTime = parseInt(startTimeStr, 10);
+        sessionDuration = Math.round((Date.now() - startTime) / 1000);
+      }
+    }
+
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name"),
       email: formData.get("email"),
       workType: formData.get("workType"),
       message: formData.get("message"),
+      referrer: typeof document !== "undefined" ? document.referrer || "Direct / Typed URL" : "Direct / Typed URL",
+      screenSize: typeof window !== "undefined" ? `${window.innerWidth}x${window.innerHeight}` : "unknown",
+      timezone: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "unknown",
+      language: typeof navigator !== "undefined" ? navigator.language : "unknown",
+      duration: sessionDuration,
     };
 
     if (data.name) {

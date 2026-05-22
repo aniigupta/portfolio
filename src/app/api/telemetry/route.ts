@@ -114,62 +114,96 @@ export async function POST(req: Request) {
               IP Address: ${ip}
             `,
             html: `
-              <div style="font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 30px rgba(0,0,0,0.03); background: #faf9ff;">
-                <div style="background: linear-gradient(135deg, #7c3aed, #db2777); padding: 24px; text-align: center;">
-                  <h2 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">Portfolio View Alert</h2>
-                  <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0 0; font-size: 14px; font-family: monospace;">Session ID: ${displaySessionId}...</p>
-                </div>
-                
-                <div style="padding: 24px; background: #ffffff;">
-                  <div style="background: rgba(124, 58, 237, 0.04); border: 1px solid rgba(124, 58, 237, 0.08); border-radius: 12px; padding: 18px; margin-bottom: 20px;">
-                    <h3 style="margin-top: 0; color: #7c3aed; font-size: 16px; font-weight: 700;">Visitor Highlights</h3>
-                    <table style="width: 100%; font-size: 14px; color: #4b5563; border-collapse: collapse;">
-                      <tr>
-                        <td style="padding: 6px 0; font-weight: 600; color: #1f2937; width: 120px;">Identity:</td>
-                        <td style="padding: 6px 0; font-weight: 700; color: #7c3aed;">${visitorNameLabel}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; font-weight: 600; color: #1f2937;">Dwell Time:</td>
-                        <td style="padding: 6px 0; font-weight: 700; color: #10b981;">⏱️ ${formattedDuration}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; font-weight: 600; color: #1f2937;">Location:</td>
-                        <td style="padding: 6px 0;">📍 ${locationLabel}</td>
-                      </tr>
-                    </table>
+              <div style="background-color: #030014; background-image: radial-gradient(circle at top, #0d0628 0%, #030014 100%); padding: 32px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #f8fafc; line-height: 1.5;">
+                <div style="max-width: 580px; margin: 0 auto; background: #0c0724; border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);">
+                  <!-- Decorative top gradient bar -->
+                  <div style="height: 6px; background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);"></div>
+                  
+                  <!-- Content padding -->
+                  <div style="padding: 32px 24px;">
+                    <!-- Logo / Header -->
+                    <div style="text-align: center; margin-bottom: 28px;">
+                      <span style="font-family: monospace; font-size: 11px; font-weight: 700; color: #38bdf8; letter-spacing: 3px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 6px 14px; border-radius: 99px; text-transform: uppercase;">
+                        Telemetry Tracker
+                      </span>
+                      <h1 style="color: #ffffff; margin: 16px 0 6px 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">
+                        Visitor Session Logged 👤
+                      </h1>
+                      <p style="color: #64748b; font-family: monospace; font-size: 12px; margin: 0;">
+                        Session ID: <span style="color: #a78bfa;">${displaySessionId}</span>
+                      </p>
+                    </div>
+
+                    <!-- Core Visitor Metrics Panel -->
+                    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(139, 92, 246, 0.15); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                      <h3 style="margin-top: 0; margin-bottom: 16px; color: #a78bfa; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                        Highlights
+                      </h3>
+                      <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                          <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #94a3b8; width: 110px;">Identity:</td>
+                          <td style="padding: 6px 0; font-size: 14px; font-weight: 700; color: #ffffff;">${visitorNameLabel}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #94a3b8;">Dwell Time:</td>
+                          <td style="padding: 6px 0; font-size: 14px; font-weight: 700; color: #10b981;">⏱️ ${formattedDuration}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #94a3b8;">Location:</td>
+                          <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #cbd5e1;">📍 ${locationLabel}</td>
+                        </tr>
+                      </table>
+                    </div>
+
+                    <!-- Traffic & Navigation -->
+                    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+                      <h3 style="margin-top: 0; margin-bottom: 16px; color: #a78bfa; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                        Traffic & Navigation
+                      </h3>
+                      <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                          <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #94a3b8; width: 110px;">Referrer Source:</td>
+                          <td style="padding: 6px 0; font-family: monospace; font-size: 12px; color: #38bdf8; word-break: break-all;">${safeReferrer}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; font-size: 13px; font-weight: 600; color: #94a3b8;">Exit Path:</td>
+                          <td style="padding: 6px 0; font-family: monospace; font-size: 12px; color: #f472b6; word-break: break-all;">${safePathname}</td>
+                        </tr>
+                      </table>
+                    </div>
+
+                    <!-- Technical Environment Details -->
+                    <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 20px;">
+                      <h3 style="margin-top: 0; margin-bottom: 16px; color: #a78bfa; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                        System Parameters
+                      </h3>
+                      <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #cbd5e1;">
+                        <tr>
+                          <td style="padding: 6px 0; font-weight: 600; color: #94a3b8; width: 110px;">Device Profile:</td>
+                          <td style="padding: 6px 0; color: #e2e8f0;">${device} (${browser} on ${os})</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; font-weight: 600; color: #94a3b8;">IP Address:</td>
+                          <td style="padding: 6px 0; font-family: monospace; font-size: 12px; color: #cbd5e1;">${ip}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; font-weight: 600; color: #94a3b8;">Locale & Lang:</td>
+                          <td style="padding: 6px 0; color: #cbd5e1;">${safeLanguage} (${safeTimezone})</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; font-weight: 600; color: #94a3b8;">Screen Layout:</td>
+                          <td style="padding: 6px 0; color: #cbd5e1;">${safeScreenSize}</td>
+                        </tr>
+                      </table>
+                    </div>
                   </div>
 
-                  <h4 style="margin: 0 0 10px 0; color: #374151; font-size: 14px; font-weight: 700; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px;">Technical Details</h4>
-                  <table style="width: 100%; font-size: 13px; color: #4b5563; border-collapse: collapse;">
-                    <tr>
-                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563; width: 130px;">Referrer Source:</td>
-                      <td style="padding: 6px 0; font-family: monospace;">${safeReferrer}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Exit Page:</td>
-                      <td style="padding: 6px 0; font-family: monospace;">${safePathname}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Device Profile:</td>
-                      <td style="padding: 6px 0;">${device} (${browser} on ${os})</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">IP Address:</td>
-                      <td style="padding: 6px 0; font-family: monospace; font-size: 12px;">${ip}</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Browser Language:</td>
-                      <td style="padding: 6px 0;">${safeLanguage} (${safeTimezone})</td>
-                    </tr>
-                    <tr>
-                      <td style="padding: 6px 0; font-weight: 600; color: #4b5563;">Screen Layout:</td>
-                      <td style="padding: 6px 0;">${safeScreenSize}</td>
-                    </tr>
-                  </table>
-                </div>
-                
-                <div style="background: #f3f4f6; text-align: center; padding: 16px; font-size: 11px; color: #9ca3af; border-top: 1px solid #e5e7eb;">
-                  Sent automatically from your Portfolio Webpage.
+                  <!-- Footer -->
+                  <div style="background: #08041a; border-top: 1px solid rgba(139, 92, 246, 0.15); padding: 20px; text-align: center;">
+                    <p style="margin: 0; font-size: 11px; color: #64748b; letter-spacing: 0.5px;">
+                      Generated by <a href="https://aniket-portfolio.vercel.app" style="color: #a78bfa; text-decoration: none; font-weight: 600;">Aniket's Portfolio Bot</a>
+                    </p>
+                  </div>
                 </div>
               </div>
             `,
