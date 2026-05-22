@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Navbar from "../components/Navbar";
 import InteractiveHero from "../components/InteractiveHero";
+import GithubActivity from "../components/GithubActivity";
 
 
 // Dynamic Imports for below-the-fold content to drastically improve LCP & TTFB
@@ -41,6 +42,7 @@ export default function Home() {
         <AIWorkflowsSection />
         <SkillsSection />
         <PerformanceSection />
+        <GithubActivity />
         <ContactSection />
       </main>
 

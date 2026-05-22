@@ -10,6 +10,8 @@ export default function InteractiveHero() {
 
   const fullText = "Building high-performance web apps and AI-integrated systems. I don't just write code; I craft intelligent digital products that bridge the gap between design and scalable engineering.";
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
   useEffect(() => {
     let i = 0;
     const typingInterval = setInterval(() => {
@@ -24,12 +26,22 @@ export default function InteractiveHero() {
     return () => clearInterval(typingInterval);
   }, []);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 1024px) and (hover: hover)");
+    setIsDesktop(mediaQuery.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
   return (
     <section className="min-h-[90vh] flex flex-col items-center justify-center text-center mb-32 pt-20 relative overflow-visible">
-      {/* Spline 3D Scene Container - Now Full Screen Background */}
-      <div className="hidden lg:block absolute inset-0 z-0 opacity-80 pointer-events-none">
-        <SplineScene />
-      </div>
+      {/* Spline 3D Scene Container - Mounted only on Desktop to optimize Mobile performance */}
+      {isDesktop && (
+        <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+          <SplineScene />
+        </div>
+      )}
 
       <div className="relative z-10 flex flex-col items-center w-full">
         <motion.div

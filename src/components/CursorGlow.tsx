@@ -4,6 +4,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CursorGlow() {
   const [mounted, setMounted] = useState(false);
+  const [hasHover, setHasHover] = useState(false);
 
   // High-performance Framer Motion values (bypasses React Render Cycle entirely to fix INP)
   const cursorX = useMotionValue(-100);
@@ -22,6 +23,12 @@ export default function CursorGlow() {
   useEffect(() => {
     setMounted(true);
 
+    // Detect if device supports a hover state (mouse/trackpad vs touch screen)
+    const mediaQuery = window.matchMedia("(hover: hover)");
+    setHasHover(mediaQuery.matches);
+    const handler = (e: MediaQueryListEvent) => setHasHover(e.matches);
+    mediaQuery.addEventListener("change", handler);
+
     const updateMousePosition = (e: MouseEvent) => {
       // Direct variable mutation! No React re-rendering triggered.
       cursorX.set(e.clientX);
@@ -29,10 +36,14 @@ export default function CursorGlow() {
     };
     // Adding passive: true immediately improves scrolling performance further
     window.addEventListener("mousemove", updateMousePosition, { passive: true });
-    return () => window.removeEventListener("mousemove", updateMousePosition);
+    
+    return () => {
+      mediaQuery.removeEventListener("change", handler);
+      window.removeEventListener("mousemove", updateMousePosition);
+    };
   }, [cursorX, cursorY]);
 
-  if (!mounted) return null;
+  if (!mounted || !hasHover) return null;
 
   return (
     <>

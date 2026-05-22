@@ -9,6 +9,7 @@ export default function ContactSection() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [toast, setToast] = useState<{ show: boolean; type: "success" | "error"; message: string } | null>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const subjects = [
@@ -35,6 +36,50 @@ export default function ContactSection() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setFocusedIndex(-1);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && focusedIndex >= 0) {
+      const optionEl = document.getElementById(`subject-option-${focusedIndex}`);
+      optionEl?.focus();
+    }
+  }, [focusedIndex, isOpen]);
+
+  const handleDropdownKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOpen) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setIsOpen(false);
+      const btn = document.getElementById("subject-button");
+      btn?.focus();
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setFocusedIndex((prev) => (prev + 1) % subjects.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setFocusedIndex((prevItem) => (prevItem - 1 + subjects.length) % subjects.length);
+    } else if (e.key === "Enter" || e.key === " ") {
+      if (focusedIndex >= 0 && focusedIndex < subjects.length) {
+        e.preventDefault();
+        setSelectedSubject(subjects[focusedIndex].label);
+        setIsOpen(false);
+        const btn = document.getElementById("subject-button");
+        btn?.focus();
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -172,23 +217,28 @@ export default function ContactSection() {
                 <label htmlFor="name" className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Name</label>
                 <div className="relative group hover:-translate-y-1 transition-transform duration-300">
                   <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
-                  <input required id="name" name="name" type="text" autoComplete="name" placeholder="John Doe" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
+                  <input required id="name" name="name" type="text" autoComplete="name" placeholder="Aarav Patel" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
                 </div>
               </div>
               <div className="space-y-3 relative z-10">
                 <label htmlFor="email" className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Email</label>
                 <div className="relative group hover:-translate-y-1 transition-transform duration-300">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
-                  <input required id="email" name="email" type="email" autoComplete="email" placeholder="john@example.com" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
+                  <input required id="email" name="email" type="email" autoComplete="email" placeholder="aarav@example.com" className="w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-primary/60 focus:bg-[#030014]/50 hover:border-primary/30 transition-all font-medium placeholder:text-gray-600 shadow-inner" />
                 </div>
               </div>
             </div>
 
             <div className="space-y-3 relative z-30" ref={dropdownRef}>
-              <label className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Subject</label>
-              <div className="relative">
+              <label id="subject-label" className="text-sm font-bold uppercase tracking-widest text-gray-300 ml-1">Subject</label>
+              <div className="relative" onKeyDown={handleDropdownKeyDown}>
                 <button
+                  id="subject-button"
                   type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={isOpen}
+                  aria-labelledby="subject-label"
+                  aria-controls="subject-listbox"
                   onClick={() => setIsOpen(!isOpen)}
                   className={`w-full bg-[#0a0a1a]/80 backdrop-blur-sm border border-white/10 rounded-2xl py-4 px-6 flex items-center justify-between transition-all hover:border-primary/30 shadow-inner hover:-translate-y-1 duration-300 ${isOpen ? 'border-primary/50 ring-2 ring-primary/20' : ''}`}
                 >
@@ -201,20 +251,29 @@ export default function ContactSection() {
                 <AnimatePresence>
                   {isOpen && (
                     <motion.div
+                      id="subject-listbox"
+                      role="listbox"
+                      aria-labelledby="subject-label"
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 5, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       className="absolute top-full left-0 right-0 z-50 mt-2 bg-[#0d0d1a] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-xl"
                     >
-                      {subjects.map((subject) => (
+                      {subjects.map((subject, index) => (
                         <button
                           key={subject.id}
+                          id={`subject-option-${index}`}
                           type="button"
+                          role="option"
+                          aria-selected={selectedSubject === subject.label}
+                          tabIndex={-1}
                           onClick={() => {
                             setSelectedSubject(subject.label);
                             setIsOpen(false);
+                            const btn = document.getElementById("subject-button");
+                            btn?.focus();
                           }}
-                          className="w-full px-6 py-4 text-left hover:bg-primary/10 flex items-center justify-between transition-colors group"
+                          className="w-full px-6 py-4 text-left hover:bg-primary/10 flex items-center justify-between transition-colors group outline-none focus:bg-primary/15"
                         >
                           <span className={`font-medium transition-colors ${selectedSubject === subject.label ? 'text-primary' : 'text-gray-300 group-hover:text-white'}`}>
                             {subject.label}
@@ -265,6 +324,8 @@ export default function ContactSection() {
       <AnimatePresence>
         {toast && toast.show && (
           <motion.div
+            role="status"
+            aria-live="polite"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9, transition: { duration: 0.2 } }}
