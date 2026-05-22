@@ -22,7 +22,7 @@ export default function VisitorTracker() {
     sessionIdRef.current = sessId;
     startTimeRef.current = parseInt(startTimeStr, 10);
 
-    const sendTelemetry = (eventType: "start" | "heartbeat" | "end", finalDuration?: number) => {
+    const sendTelemetry = (eventType: "start" | "heartbeat" | "end" | "stayed_5s", finalDuration?: number) => {
       const name = sessionStorage.getItem("visitor_name") || "";
       const hasSentEmail = sessionStorage.getItem("has_sent_email") || "false";
       const totalDuration = finalDuration !== undefined ? finalDuration : Math.round((Date.now() - startTimeRef.current) / 1000);
@@ -37,8 +37,8 @@ export default function VisitorTracker() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         pathname: window.location.pathname,
         name,
-        // Send email only when they land and stay at least 5s, triggered on end/visibility hiding, and once per session
-        shouldEmail: eventType === "end" && totalDuration >= 5 && hasSentEmail === "false"
+        // Send email only when they land and stay at least 5s, triggered on stayed_5s (reliable) or end/visibility hiding, and once per session
+        shouldEmail: (eventType === "end" || eventType === "stayed_5s") && totalDuration >= 5 && hasSentEmail === "false"
       };
 
       if (payload.shouldEmail) {
@@ -70,6 +70,11 @@ export default function VisitorTracker() {
       sendTelemetry("start");
     }, 1000);
 
+    // Send email telemetry stayed_5s event after 5.5 seconds to reliably send email on both mobile and desktop while in the foreground
+    const emailTimeout = setTimeout(() => {
+      sendTelemetry("stayed_5s");
+    }, 5500);
+
     // Heartbeat every 30 seconds to track active state
     const interval = setInterval(() => {
       sendTelemetry("heartbeat");
@@ -92,6 +97,7 @@ export default function VisitorTracker() {
 
     return () => {
       clearTimeout(startTimeout);
+      clearTimeout(emailTimeout);
       clearInterval(interval);
       window.removeEventListener("beforeunload", handleUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
