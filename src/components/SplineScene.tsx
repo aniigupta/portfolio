@@ -1,14 +1,18 @@
 "use client";
 import { Suspense } from "react";
 import { motion } from "framer-motion";
-
-
+import Script from "next/script";
 
 export default function SplineScene() {
   const SplineViewer = 'spline-viewer' as any;
 
   return (
     <div className="w-full h-full relative pointer-events-auto overflow-hidden">
+      <Script 
+        src="https://unpkg.com/@splinetool/viewer@1.12.86/build/spline-viewer.js" 
+        type="module"
+        strategy="afterInteractive"
+      />
       <Suspense fallback={<SplineLoader />}>
         <SplineViewer 
           url="https://prod.spline.design/c1f5LCvI-LgdMzfQ/scene.splinecode"

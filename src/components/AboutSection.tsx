@@ -122,7 +122,7 @@ export default function AboutSection() {
           >
             <div className="absolute top-0 left-0 w-full h-32 bg-[radial-gradient(circle_at_top,rgba(139,92,246,0.2),transparent_70%)] opacity-80 mix-blend-screen pointer-events-none"></div>
             <div className="relative w-32 h-32 rounded-full border-4 border-white/5 overflow-hidden z-10 bg-white/5 backdrop-blur-md mb-6 shadow-[0_0_30px_rgba(139,92,246,0.15)] group hover:border-primary/30 transition-all">
-              <Image src="/profile.png" alt="Aniket Gupta - Software Engineer and AI Specialist Official Photo" fill className="object-cover object-top hover:scale-110 transition-transform duration-500" />
+              <Image src="/profile.png" alt="Aniket Gupta - Software Engineer and AI Specialist Official Photo" fill sizes="128px" className="object-cover object-top hover:scale-110 transition-transform duration-500" />
             </div>
             <h3 className="text-2xl font-black mb-1">Aniket Gupta</h3>
             <p className="text-primary font-bold text-sm tracking-widest uppercase mb-6">Full Stack Developer</p>

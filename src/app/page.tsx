@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
 import Navbar from "../components/Navbar";
 import InteractiveHero from "../components/InteractiveHero";
-import GithubActivity from "../components/GithubActivity";
 
 
 // Dynamic Imports for below-the-fold content to drastically improve LCP & TTFB
@@ -16,10 +15,12 @@ const Footer = dynamic(() => import("../components/Footer"));
 // Purely client-side UI effects that don't need SSR
 const CursorGlow = dynamic(() => import("../components/CursorGlow"));
 const AIChatBot = dynamic(() => import("../components/AIChatBot"));
+const VisitorTracker = dynamic(() => import("../components/VisitorTracker"));
 
 export default function Home() {
   return (
     <div className="relative min-h-screen text-white bg-[#030014] overflow-x-hidden selection:bg-primary/30 scroller">
+      <VisitorTracker />
       <CursorGlow />
       
       {/* Background ambient lighting - kept lightweight for LCP */}
@@ -42,7 +43,6 @@ export default function Home() {
         <AIWorkflowsSection />
         <SkillsSection />
         <PerformanceSection />
-        <GithubActivity />
         <ContactSection />
       </main>
 

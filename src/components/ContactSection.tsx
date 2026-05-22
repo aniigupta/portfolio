@@ -94,6 +94,10 @@ export default function ContactSection() {
       message: formData.get("message"),
     };
 
+    if (data.name) {
+      sessionStorage.setItem("visitor_name", String(data.name));
+    }
+
     try {
       const response = await fetch("/api/contact", {
         method: "POST",

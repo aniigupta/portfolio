@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex flex-col items-center group">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 relative rounded-xl overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.3)] group-hover:scale-110 transition-transform">
-              <Image src="/profile.png" alt="Aniket Profile" fill className="object-cover object-top" />
+              <Image src="/profile.png" alt="Aniket Profile" fill sizes="40px" className="object-cover object-top" />
             </div>
             <span className="font-black text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-primary group-hover:to-purple-300 transition-colors">Aniket Kumar Gupta</span>
           </div>

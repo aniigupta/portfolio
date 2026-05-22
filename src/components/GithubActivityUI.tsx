@@ -43,7 +43,7 @@ export default function GithubActivityUI({ userData, repos }: { userData: Github
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -z-10 group-hover:bg-primary/20 transition-colors"></div>
           <div className="flex items-center gap-4 mb-8">
-            <Image src={userData.avatar_url} alt={`${userData.login} GitHub avatar`} width={64} height={64} unoptimized className="w-16 h-16 rounded-full border border-white/10" />
+            <Image src={userData.avatar_url} alt={`${userData.login} GitHub avatar`} width={64} height={64} className="w-16 h-16 rounded-full border border-white/10" />
             <div>
               <h3 className="font-bold text-xl">{userData.name || userData.login}</h3>
               <a href={userData.html_url} target="_blank" rel="noreferrer" className="text-muted-foreground text-sm hover:text-primary transition-colors">@{userData.login}</a>

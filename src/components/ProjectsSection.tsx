@@ -60,7 +60,7 @@ export default function ProjectsSection() {
           >
             <div className={`relative h-[400px] md:h-[500px] w-full rounded-[2rem] overflow-hidden glass-card p-2 shadow-[0_0_40px_rgba(0,0,0,0.5)] ${i % 2 !== 0 ? 'lg:order-2' : ''}`}>
               <div className="relative w-full h-full rounded-[1.5rem] overflow-hidden">
-                <Image src={proj.image} alt={`${proj.title} Web Interface`} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                <Image src={proj.image} alt={`${proj.title} Web Interface`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#030014] via-transparent to-transparent opacity-60"></div>
                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px] flex items-center justify-center">
                   <a 
