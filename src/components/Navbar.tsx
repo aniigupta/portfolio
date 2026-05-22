@@ -44,10 +44,10 @@ export default function Navbar() {
             AI Workflows
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <Link href="/Resume_Aniket_2025.pdf" target="_blank" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
+          <a href="/Resume_Aniket_2025.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
             Resume
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+          </a>
           <Link href="#contact" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
             Contact
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>

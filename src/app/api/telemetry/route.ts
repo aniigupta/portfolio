@@ -154,8 +154,13 @@ export async function POST(req: Request) {
         `,
       };
 
-      await transporter.sendMail(mailOptions);
-      console.log(`Successfully dispatched session alert email for ${sessionId}`);
+      try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Successfully dispatched session alert email for ${sessionId}`);
+      } catch (mailError) {
+        console.error('Nodemailer Telemetry Email Error:', mailError);
+        // Do not fail the request; allow the client to receive a 200 success response.
+      }
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
