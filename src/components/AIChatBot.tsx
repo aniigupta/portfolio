@@ -8,9 +8,7 @@ type Message = { id: number; text: string; sender: "bot" | "user" };
 export default function AIChatBot() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "Hi! I'm Aniket's AI assistant. Want to know about his tech stack, experience, or latest projects?", sender: "bot" }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -21,6 +19,16 @@ export default function AIChatBot() {
 
   useEffect(() => {
     setMounted(true);
+    const savedName = sessionStorage.getItem("visitor_name");
+    if (savedName) {
+      setMessages([
+        { id: 1, text: `Hi ${savedName}! I'm Aniket's AI assistant. Want to know about his tech stack, experience, or latest projects?`, sender: "bot" }
+      ]);
+    } else {
+      setMessages([
+        { id: 1, text: "Hi! I'm Aniket's AI assistant. What is your name?", sender: "bot" }
+      ]);
+    }
   }, []);
 
   useEffect(() => {
@@ -39,8 +47,33 @@ export default function AIChatBot() {
     setInputVal("");
     setIsTyping(true);
 
+    const savedName = sessionStorage.getItem("visitor_name");
+
     // Simulated AI Processing Delay
     setTimeout(() => {
+      if (!savedName) {
+        // Save user input as their name
+        const nameInput = userMsg.text.trim();
+        sessionStorage.setItem("visitor_name", nameInput);
+
+        // Instantly notify telemetry endpoint of the name update
+        fetch("/api/telemetry", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: sessionStorage.getItem("portfolio_sess_id") || "unknown",
+            eventType: "name_update",
+            name: nameInput,
+            shouldEmail: false
+          })
+        }).catch(() => {});
+
+        const botResponse = `Nice to meet you, ${nameInput}! 😊 I can help you learn about Aniket's experience, tech stack, or projects. What would you like to know?`;
+        setMessages(prev => [...prev, { id: Date.now() + 1, text: botResponse, sender: "bot" }]);
+        setIsTyping(false);
+        return;
+      }
+
       let botResponse = "I'm currently running in static mode, but Aniket specializes in Next.js, FastAPI, and building scalable full-stack applications. Would you like to shoot him an email to chat directly?";
       
       const lower = userMsg.text.toLowerCase();
