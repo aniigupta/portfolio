@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 
 export default function VisitorTracker() {
   const pathname = usePathname();
-  const startTimeRef = useRef<number>(Date.now());
+  // Seeded from sessionStorage on mount; reading the clock during render is impure.
+  const startTimeRef = useRef<number>(0);
   const sessionIdRef = useRef<string>("");
 
   useEffect(() => {

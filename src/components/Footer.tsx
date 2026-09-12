@@ -1,24 +1,47 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
+  const links = [
+    { label: "Projects", href: "#projects" },
+    { label: "Experience", href: "#about" },
+    { label: "AI Workflows", href: "#ai-workflows" },
+    { label: "Contact", href: "#contact" },
+  ];
+
   return (
-    <footer className="py-20 border-t border-white/5 bg-[#030014]/80 backdrop-blur-sm relative overflow-hidden mt-40">
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/5 blur-[100px] rounded-full pointer-events-none -z-10"></div>
-      
-      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-6">
-        <div className="flex flex-col items-center group">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 relative rounded-xl overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.3)] group-hover:scale-110 transition-transform">
-              <Image src="/profile.png" alt="Aniket Profile" fill sizes="40px" className="object-cover object-top" />
-            </div>
-            <span className="font-black text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-primary group-hover:to-purple-300 transition-colors">Aniket Kumar Gupta</span>
+    <footer className="w-full bg-[#f5f5f7] py-16">
+      <div className="tile-inner">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <span className="relative block h-9 w-9 overflow-hidden rounded-full ring-1 ring-black/10">
+              <Image src="/profile.png" alt="Aniket Gupta" fill sizes="36px" className="object-cover object-top" />
+            </span>
+            <span className="caption-strong text-[#1d1d1f]">Aniket Kumar Gupta</span>
           </div>
-          <p className="text-muted-foreground text-sm flex items-center gap-2">
-            © {new Date().getFullYear()} Engineered with <span className="text-primary animate-pulse">♥</span> in India.
-          </p>
+
+          <nav aria-label="Footer" className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2">
+            {links.map((link) => (
+              <Link key={link.href} href={link.href} className="caption text-[#333333] transition-colors hover:text-[#0066cc]">
+                {link.label}
+              </Link>
+            ))}
+            <a
+              href="/Aniket_Kumar_Gupta_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="caption text-[#333333] transition-colors hover:text-[#0066cc]"
+            >
+              Resume
+            </a>
+          </nav>
         </div>
 
-
+        <div className="mt-10 border-t border-[#e0e0e0] pt-6">
+          <p className="fine-print text-center text-[#7a7a7a] md:text-left">
+            Copyright © {new Date().getFullYear()} Aniket Kumar Gupta. Engineered in India.
+          </p>
+        </div>
       </div>
     </footer>
   );

@@ -2,64 +2,177 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Menu, X } from "lucide-react";
+import { springSnappy, springSoft } from "../lib/motion";
+
+type NavItem = { label: string; href: string; external?: boolean };
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "Projects", href: "#projects" },
+  { label: "Experience", href: "#about" },
+  { label: "AI Workflows", href: "#ai-workflows" },
+  { label: "Resume", href: "/Aniket_Kumar_Gupta_Resume.pdf", external: true },
+  { label: "Contact", href: "#contact" },
+];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [active, setActive] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Track which section is in view so the pill rests on the current page region
+  useEffect(() => {
+    const ids = ["projects", "about", "ai-workflows", "contact"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActive(`#${visible.target.id}`);
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.25, 0.5, 1] }
+    );
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const pillTarget = hovered ?? active;
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300 border-b ${
-      scrolled ? "bg-[#030014]/80 backdrop-blur-lg border-white/10 shadow-lg" : "bg-transparent border-transparent py-6"
-    }`}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <button
+    <motion.header
+      initial={{ opacity: 0, y: -16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ ...springSoft, delay: 0.1 }}
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 sm:px-6"
+    >
+      <nav
+        aria-label="Primary"
+        className={`pointer-events-auto mx-auto flex max-w-4xl items-center justify-between gap-3 rounded-full transition-all duration-500 ${
+          scrolled
+            ? "mt-3 border border-black/[0.06] bg-[rgba(245,245,247,0.82)] px-3 py-2 backdrop-blur-xl backdrop-saturate-150"
+            : "mt-5 border border-transparent bg-white/50 px-3 py-2.5 backdrop-blur-sm"
+        }`}
+      >
+        <motion.button
           type="button"
-          className="flex items-center gap-3 group cursor-pointer bg-transparent border-0 p-0 text-left"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Scroll to top"
+          className="flex shrink-0 items-center gap-2.5 rounded-full bg-transparent p-1 pr-2 text-left"
+          whileTap={{ scale: 0.95 }}
+          transition={springSnappy}
         >
-          <div className="w-10 h-10 relative rounded-xl overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.3)] group-hover:shadow-[0_0_25px_rgba(139,92,246,0.8)] transition-all duration-300 group-hover:scale-110">
-            <Image src="/profile.png" alt="Aniket Gupta" fill className="object-cover object-top" priority sizes="40px" />
-          </div>
-          <span className="font-black text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 group-hover:from-primary group-hover:to-purple-300 transition-colors">Aniket Gupta</span>
-        </button>
+          <span className="relative block h-8 w-8 shrink-0">
+            <span className="absolute inset-0 overflow-hidden rounded-full ring-1 ring-black/10">
+              <Image src="/profile.png" alt="Aniket Gupta" fill className="object-cover object-top" priority sizes="32px" />
+            </span>
+            <span className="absolute -bottom-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full border-2 border-white bg-[#30d158]" aria-hidden="true" />
+          </span>
+          <span className="hidden text-[15px] font-semibold tracking-[-0.01em] text-[#1d1d1f] sm:block">Aniket Gupta</span>
+        </motion.button>
 
-        <div className="hidden md:flex items-center gap-8 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-          <Link href="#projects" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
-            Projects
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-          <Link href="#about" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
-            Experience
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-          <Link href="#ai-workflows" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
-            AI Workflows
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </Link>
-          <a href="/Resume_Aniket_2025.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
-            Resume
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </a>
-          <Link href="#contact" className="text-sm font-bold text-gray-200 hover:text-white transition-colors relative group">
-            Contact
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </Link>
+        <div className="hidden items-center md:flex" onMouseLeave={() => setHovered(null)}>
+          {NAV_ITEMS.map((item) => {
+            const isPillTarget = pillTarget === item.href;
+            const linkClass = `relative z-10 block px-3.5 py-2 text-[13px] tracking-[-0.01em] transition-colors duration-200 ${
+              isPillTarget ? "text-[#1d1d1f]" : "text-[#1d1d1f]/60"
+            }`;
+
+            return (
+              <div key={item.href} className="relative" onMouseEnter={() => setHovered(item.href)}>
+                {isPillTarget && (
+                  <motion.span
+                    layoutId="navPill"
+                    className="absolute inset-0 rounded-full bg-white"
+                    transition={springSoft}
+                    aria-hidden="true"
+                  />
+                )}
+                {item.external ? (
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link href={item.href} className={linkClass}>
+                    {item.label}
+                  </Link>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        <div className="flex items-center gap-4">
-          <a href="#contact" className="bg-violet-700 hover:bg-violet-600 text-white border border-violet-500/70 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 shadow-[0_0_20px_rgba(76,29,149,0.25)] hover:shadow-[0_0_24px_rgba(76,29,149,0.45)] transform hover:scale-105 active:scale-95">
+        <div className="flex shrink-0 items-center gap-1.5">
+          <motion.a
+            href="#contact"
+            className="rounded-full bg-[#0066cc] px-5 py-2 text-[14px] tracking-[-0.224px] text-white transition-opacity hover:opacity-90"
+            whileTap={{ scale: 0.95 }}
+            transition={springSnappy}
+          >
             Hire Me
-          </a>
+          </motion.a>
+
+          <motion.button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={menuOpen}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-black/[0.08] bg-white text-[#1d1d1f] md:hidden"
+            whileTap={{ scale: 0.95 }}
+            transition={springSnappy}
+          >
+            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </motion.button>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={springSoft}
+            className="pointer-events-auto mx-auto mt-2 max-w-4xl overflow-hidden rounded-[18px] border border-black/[0.06] bg-[rgba(245,245,247,0.92)] p-2 backdrop-blur-xl md:hidden"
+          >
+            {NAV_ITEMS.map((item) =>
+              item.external ? (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="block rounded-[11px] px-4 py-3 text-[15px] text-[#1d1d1f] transition-colors hover:bg-white"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="block rounded-[11px] px-4 py-3 text-[15px] text-[#1d1d1f] transition-colors hover:bg-white"
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }

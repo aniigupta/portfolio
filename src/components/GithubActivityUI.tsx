@@ -1,7 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { GitBranch, GitCommit, Github, Star, GitFork } from "lucide-react";
+import { GitBranch, Star, GitFork } from "lucide-react";
+import { fadeUp, staggerContainer, viewportOnce } from "../lib/motion";
 
 type GithubUser = {
   avatar_url: string;
@@ -26,76 +27,77 @@ export default function GithubActivityUI({ userData, repos }: { userData: Github
   if (!userData) return null;
 
   return (
-    <section className="mb-40 pt-10">
-      <motion.div className="mb-12" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-        <span className="text-primary font-bold tracking-widest text-xs uppercase block mb-3 flex items-center gap-2">
-          <Github className="w-3 h-3" /> Live Statistics
-        </span>
-        <h2 className="text-4xl md:text-5xl font-black mb-6">GitHub Activity</h2>
-      </motion.div>
-
-      <div className="grid md:grid-cols-12 gap-8">
-        <motion.div 
-          className="md:col-span-4 glass-card p-8 rounded-3xl border border-white/5 relative overflow-hidden group hover:border-primary/20 transition-all"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full -z-10 group-hover:bg-primary/20 transition-colors"></div>
-          <div className="flex items-center gap-4 mb-8">
-            <Image src={userData.avatar_url} alt={`${userData.login} GitHub avatar`} width={64} height={64} className="w-16 h-16 rounded-full border border-white/10" />
-            <div>
-              <h3 className="font-bold text-xl">{userData.name || userData.login}</h3>
-              <a href={userData.html_url} target="_blank" rel="noreferrer" className="text-muted-foreground text-sm hover:text-primary transition-colors">@{userData.login}</a>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
-              <span className="block text-2xl font-black text-white mb-1">{userData.public_repos}</span>
-              <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Repositories</span>
-            </div>
-            <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
-              <span className="block text-2xl font-black text-white mb-1">{userData.followers}</span>
-              <span className="text-xs uppercase tracking-widest text-muted-foreground font-bold">Followers</span>
-            </div>
-          </div>
+    <section className="tile tile-light">
+      <div className="tile-inner">
+        <motion.div className="mb-10" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
+          <span className="eyebrow mb-3">Live statistics</span>
+          <h2 className="display-lg text-[#1d1d1f]">GitHub activity.</h2>
         </motion.div>
 
-        <motion.div 
-          className="md:col-span-8 space-y-4"
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+        <motion.div
+          className="grid gap-5 md:grid-cols-12"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
         >
-          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <GitCommit className="w-5 h-5 text-primary" /> Recently Updated
-          </h3>
-          
-          <div className="grid sm:grid-cols-2 gap-4">
-            {repos.map((repo) => (
-              <a 
-                key={repo.id} 
-                href={repo.html_url} 
-                target="_blank" 
-                rel="noreferrer"
-                className="glass-card p-5 rounded-2xl border border-white/5 hover:border-primary/40 hover:-translate-y-1 transition-all group relative overflow-hidden"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <h4 className="font-bold text-white group-hover:text-primary transition-colors truncate pr-4">{repo.name}</h4>
-                  <GitFork className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-4 min-h-[32px]">{repo.description || "No description provided."}</p>
-                <div className="flex items-center justify-between text-xs uppercase font-bold tracking-widest">
-                  <span className="text-primary">{repo.language || "Markdown"}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1 text-muted-foreground"><Star className="w-3 h-3" /> {repo.stargazers_count}</span>
-                    <span className="flex items-center gap-1 text-muted-foreground"><GitBranch className="w-3 h-3" /> {repo.forks_count}</span>
+          <motion.div variants={fadeUp} className="surface-card p-8 md:col-span-4">
+            <div className="mb-8 flex items-center gap-4">
+              <Image
+                src={userData.avatar_url}
+                alt={`${userData.login} GitHub avatar`}
+                width={64}
+                height={64}
+                className="h-16 w-16 rounded-full"
+              />
+              <div>
+                <h3 className="tagline text-[#1d1d1f]">{userData.name || userData.login}</h3>
+                <a href={userData.html_url} target="_blank" rel="noreferrer" className="text-link caption">
+                  @{userData.login}
+                </a>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-[11px] bg-[#f5f5f7] p-4 text-center">
+                <span className="display-md block text-[#1d1d1f]">{userData.public_repos}</span>
+                <span className="caption text-[#7a7a7a]">Repositories</span>
+              </div>
+              <div className="rounded-[11px] bg-[#f5f5f7] p-4 text-center">
+                <span className="display-md block text-[#1d1d1f]">{userData.followers}</span>
+                <span className="caption text-[#7a7a7a]">Followers</span>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div variants={fadeUp} className="md:col-span-8">
+            <h3 className="caption-strong mb-4 text-[#1d1d1f]">Recently updated</h3>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {repos.map((repo) => (
+                <a key={repo.id} href={repo.html_url} target="_blank" rel="noreferrer" className="surface-card block p-5">
+                  <div className="mb-3 flex items-start justify-between">
+                    <h4 className="caption-strong truncate pr-4 text-[#1d1d1f]">{repo.name}</h4>
+                    <GitFork className="h-4 w-4 shrink-0 text-[#7a7a7a]" />
                   </div>
-                </div>
-              </a>
-            ))}
-          </div>
+                  <p className="caption mb-4 line-clamp-2 min-h-[40px] text-[#333333]">
+                    {repo.description || "No description provided."}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="fine-print text-[#0066cc]">{repo.language || "Markdown"}</span>
+                    <div className="flex items-center gap-3 text-[#7a7a7a]">
+                      <span className="fine-print flex items-center gap-1">
+                        <Star className="h-3 w-3" /> {repo.stargazers_count}
+                      </span>
+                      <span className="fine-print flex items-center gap-1">
+                        <GitBranch className="h-3 w-3" /> {repo.forks_count}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

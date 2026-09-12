@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     let data;
     try {
       data = await req.json();
-    } catch (parseError) {
+    } catch {
       console.warn('Contact API: received request with empty or invalid JSON body.');
       return NextResponse.json({ error: 'Invalid or empty JSON body' }, { status: 400 });
     }

@@ -1,10 +1,11 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, type ElementType } from "react";
 import { motion } from "framer-motion";
 import Script from "next/script";
 
 export default function SplineScene() {
-  const SplineViewer = 'spline-viewer' as any;
+  // Custom element registered at runtime by the Spline viewer script
+  const SplineViewer = 'spline-viewer' as unknown as ElementType;
 
   return (
     <div className="w-full h-full relative pointer-events-auto overflow-hidden">

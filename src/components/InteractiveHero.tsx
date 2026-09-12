@@ -1,124 +1,339 @@
 "use client";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ChevronRight, Download, Github, Linkedin, Mail } from "lucide-react";
-import SplineScene from "./SplineScene";
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Download, Github, Linkedin, Mail } from "lucide-react";
+import { springSnappy, springSoft } from "../lib/motion";
+
+type Token = { text: string; tone?: "keyword" | "string" | "fn" | "comment" | "punct" | "prop" };
+
+type Capability = {
+  id: string;
+  label: string;
+  caption: string;
+  file: string;
+  lines: Token[][];
+};
+
+const TONE_CLASS: Record<NonNullable<Token["tone"]>, string> = {
+  keyword: "text-[#0066cc]",
+  string: "text-[#008a3e]",
+  fn: "text-[#1d1d1f] font-semibold",
+  comment: "text-[#7a7a7a]",
+  punct: "text-[#7a7a7a]",
+  prop: "text-[#333333]",
+};
+
+const CAPABILITIES: Capability[] = [
+  {
+    id: "architecture",
+    label: "Architecture",
+    caption: "Modular route handlers, typed boundaries, zero technical debt.",
+    file: "app/api/orders/route.ts",
+    lines: [
+      [{ text: "// Typed edge handler, cached at the boundary", tone: "comment" }],
+      [
+        { text: "export const ", tone: "keyword" },
+        { text: "runtime " },
+        { text: "= ", tone: "punct" },
+        { text: "\"edge\"", tone: "string" },
+      ],
+      [],
+      [
+        { text: "export async function ", tone: "keyword" },
+        { text: "GET", tone: "fn" },
+        { text: "(req: Request) {", tone: "punct" },
+      ],
+      [
+        { text: "  const ", tone: "keyword" },
+        { text: "orders " },
+        { text: "= await ", tone: "keyword" },
+        { text: "db.orders.", tone: "punct" },
+        { text: "findMany", tone: "fn" },
+        { text: "({", tone: "punct" },
+      ],
+      [
+        { text: "    where", tone: "prop" },
+        { text: ": { tenantId ", tone: "punct" },
+        { text: "},", tone: "punct" },
+      ],
+      [
+        { text: "    take", tone: "prop" },
+        { text: ": ", tone: "punct" },
+        { text: "50", tone: "keyword" },
+        { text: ",", tone: "punct" },
+      ],
+      [{ text: "  })", tone: "punct" }],
+      [
+        { text: "  return ", tone: "keyword" },
+        { text: "Response." },
+        { text: "json", tone: "fn" },
+        { text: "(orders)", tone: "punct" },
+      ],
+      [{ text: "}", tone: "punct" }],
+    ],
+  },
+  {
+    id: "ai",
+    label: "AI Pipelines",
+    caption: "LLM extraction over unstructured data at ~90% accuracy.",
+    file: "lib/extract.py",
+    lines: [
+      [{ text: "# Structured insight extraction from raw articles", tone: "comment" }],
+      [
+        { text: "async def ", tone: "keyword" },
+        { text: "extract", tone: "fn" },
+        { text: "(doc: ", tone: "punct" },
+        { text: "str", tone: "prop" },
+        { text: ") -> Insight:", tone: "punct" },
+      ],
+      [
+        { text: "    schema " },
+        { text: "= ", tone: "punct" },
+        { text: "Insight." },
+        { text: "model_json_schema", tone: "fn" },
+        { text: "()", tone: "punct" },
+      ],
+      [],
+      [
+        { text: "    result " },
+        { text: "= await ", tone: "keyword" },
+        { text: "llm." },
+        { text: "complete", tone: "fn" },
+        { text: "(", tone: "punct" },
+      ],
+      [
+        { text: "        prompt", tone: "prop" },
+        { text: "=", tone: "punct" },
+        { text: "CONTEXT_TEMPLATE." },
+        { text: "format", tone: "fn" },
+        { text: "(doc=doc),", tone: "punct" },
+      ],
+      [
+        { text: "        response_format", tone: "prop" },
+        { text: "=schema,", tone: "punct" },
+      ],
+      [{ text: "    )", tone: "punct" }],
+      [
+        { text: "    return ", tone: "keyword" },
+        { text: "Insight." },
+        { text: "validate", tone: "fn" },
+        { text: "(result)", tone: "punct" },
+      ],
+    ],
+  },
+  {
+    id: "performance",
+    label: "Performance",
+    caption: "Sub-second LCP through ruthless payload discipline.",
+    file: "app/page.tsx",
+    lines: [
+      [{ text: "// Ship only what the first paint actually needs", tone: "comment" }],
+      [
+        { text: "const ", tone: "keyword" },
+        { text: "Projects " },
+        { text: "= ", tone: "punct" },
+        { text: "dynamic", tone: "fn" },
+        { text: "(() => ", tone: "punct" },
+        { text: "import", tone: "keyword" },
+        { text: "(", tone: "punct" },
+        { text: "\"./Projects\"", tone: "string" },
+        { text: "))", tone: "punct" },
+      ],
+      [],
+      [
+        { text: "<", tone: "punct" },
+        { text: "Image", tone: "fn" },
+      ],
+      [
+        { text: "  src", tone: "prop" },
+        { text: "=", tone: "punct" },
+        { text: "\"/hero.png\"", tone: "string" },
+      ],
+      [
+        { text: "  sizes", tone: "prop" },
+        { text: "=", tone: "punct" },
+        { text: "\"(max-width: 1024px) 100vw, 50vw\"", tone: "string" },
+      ],
+      [{ text: "  priority", tone: "prop" }],
+      [{ text: "/>", tone: "punct" }],
+      [],
+      [{ text: "// LCP 1.2s · INP 80ms · CLS 0.01", tone: "comment" }],
+    ],
+  },
+];
+
+const HEADLINE = ["Building", "intelligent", "digital", "products."];
 
 export default function InteractiveHero() {
-  const [terminalText, setTerminalText] = useState("");
-  const [isTyping, setIsTyping] = useState(true);
-
-  const fullText = "Building high-performance web apps and AI-integrated systems. I don't just write code; I craft intelligent digital products that bridge the gap between design and scalable engineering.";
-
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    let i = 0;
-    const typingInterval = setInterval(() => {
-      if (i < fullText.length) {
-        setTerminalText(fullText.slice(0, i + 1));
-        i++;
-      } else {
-        setIsTyping(false);
-        clearInterval(typingInterval);
-      }
-    }, 40);
-    return () => clearInterval(typingInterval);
-  }, []);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px) and (hover: hover)");
-    setIsDesktop(mediaQuery.matches);
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
+  const [activeTab, setActiveTab] = useState(CAPABILITIES[0].id);
+  const active = CAPABILITIES.find((cap) => cap.id === activeTab) ?? CAPABILITIES[0];
 
   return (
-    <section className="min-h-[90vh] flex flex-col items-center justify-center text-center mb-32 pt-20 relative overflow-visible">
-      {/* Spline 3D Scene Container - Mounted only on Desktop to optimize Mobile performance */}
-      {isDesktop && (
-        <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
-          <SplineScene />
-        </div>
-      )}
-
-      <div className="relative z-10 flex flex-col items-center w-full">
+    <section className="tile tile-light flex min-h-[92vh] flex-col items-center justify-center pt-32 md:pt-36">
+      <div className="tile-inner flex flex-col items-center text-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-2"
+          transition={{ ...springSoft, delay: 0.05 }}
+          className="mb-8 inline-flex items-center gap-2.5 rounded-full bg-[#f5f5f7] py-1.5 pl-3 pr-4"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-          <span className="text-xs font-bold text-primary tracking-widest uppercase">Available for Hire</span>
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#30d158] opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#30d158]"></span>
+          </span>
+          <span className="caption text-[#333333]">Available for Q2/Q3 projects</span>
         </motion.div>
 
-        <motion.h1
-          className="text-5xl md:text-8xl font-black mb-6 leading-[1.1] tracking-tighter"
-          initial={{ opacity: 0, y: 20 }}
+        <h1 className="hero-display mb-6 max-w-4xl text-[#1d1d1f]">
+          {HEADLINE.map((word, i) => (
+            <span key={word} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+              <motion.span
+                className="inline-block"
+                initial={{ y: "105%", opacity: 0 }}
+                animate={{ y: "0%", opacity: 1 }}
+                transition={{ type: "spring", stiffness: 220, damping: 26, delay: 0.08 + i * 0.07 }}
+              >
+                {word}
+              </motion.span>
+              {i < HEADLINE.length - 1 && <span className="inline-block w-[0.25em]" />}
+            </span>
+          ))}
+        </h1>
+
+        <motion.p
+          className="lead mb-9 max-w-2xl text-balance text-[#1d1d1f]"
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ ...springSoft, delay: 0.42 }}
         >
-          Building <span className="purple-gradient-text">Intelligent</span><br />Products
-        </motion.h1>
+          Full stack engineering for high-performance web applications and AI-integrated systems.
+        </motion.p>
 
         <motion.div
-          className="bg-[#0d0d1a]/80 backdrop-blur-2xl mb-12 max-w-2xl w-full mx-auto p-6 rounded-2xl border border-white/20 text-left font-mono relative overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_20px_rgba(139,92,246,0.1)] hover:border-primary/50 transition-all duration-500"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="absolute top-0 left-0 right-0 h-10 bg-white/10 border-b border-white/10 flex items-center px-4 gap-2">
-            <div className="w-3.5 h-3.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-            <div className="w-3.5 h-3.5 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
-            <div className="w-3.5 h-3.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-            <span className="text-xs text-white/70 ml-2 font-sans font-semibold tracking-wide">aniket@ai-portfolio: ~</span>
-          </div>
-          <div className="mt-10 text-sm md:text-lg text-white font-medium min-h-[80px] flex gap-3 relative">
-            <span className="text-primary font-bold animate-pulse">&gt;</span>
-            <div className="leading-relaxed">
-              {/* SSR Sizing fallback keeps layout stable before hydration. */}
-              <span className="opacity-0 pointer-events-none absolute inset-0" aria-hidden="true">
-                {fullText}
-              </span>
-              <p className="relative drop-shadow-sm">
-                {terminalText}
-                {isTyping && <motion.span animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-2.5 h-5 bg-primary ml-1 align-middle shadow-[0_0_10px_rgba(139,92,246,0.8)]" />}
-                {!isTyping && <motion.span animate={{ opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-2.5 h-5 bg-primary/60 ml-1 align-middle shadow-[0_0_5px_rgba(139,92,246,0.4)]" />}
-              </p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="flex flex-wrap justify-center items-center gap-6 mb-20 relative z-10"
-          initial={{ opacity: 0, y: 20 }}
+          className="mb-16 flex flex-wrap items-center justify-center gap-4"
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ ...springSoft, delay: 0.52 }}
         >
-          <a href="#projects" className="bg-violet-700 hover:bg-violet-600 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-violet-900/30 flex items-center gap-2 group hover:scale-105">
-            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            View Case Studies
-          </a>
-          <a href="/Resume_Aniket_2025.pdf" download="Resume_Aniket_2025.pdf" className="glass-card px-8 py-3.5 rounded-xl font-bold hover:bg-white/5 transition-all flex items-center gap-2 border border-white/10 hover:scale-105">
-            <Download className="w-5 h-5" />
+          <motion.a href="#projects" className="btn-primary" whileTap={{ scale: 0.95 }} transition={springSnappy}>
+            View case studies
+          </motion.a>
+          <motion.a
+            href="/Aniket_Kumar_Gupta_Resume.pdf"
+            download="Aniket_Kumar_Gupta_Resume.pdf"
+            className="btn-secondary"
+            whileTap={{ scale: 0.95 }}
+            transition={springSnappy}
+          >
+            <Download className="h-4 w-4" />
             Resume
-          </a>
-          <a href="#contact" className="hidden sm:flex nav-link items-center gap-1 mt-0 ml-2 hover:text-primary transition-colors">
-            Let&apos;s Build <ChevronRight className="w-4 h-4" />
-          </a>
+          </motion.a>
+        </motion.div>
+
+        {/* Interactive capability showcase - the artifact this tile is built around */}
+        <motion.div
+          className="w-full max-w-3xl overflow-hidden rounded-[18px] border border-black/[0.08] bg-white text-left"
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...springSoft, delay: 0.6 }}
+        >
+          <div className="flex items-center gap-1 border-b border-[#f0f0f0] p-2">
+            {CAPABILITIES.map((cap) => (
+              <motion.button
+                key={cap.id}
+                type="button"
+                onClick={() => setActiveTab(cap.id)}
+                aria-pressed={activeTab === cap.id}
+                whileTap={{ scale: 0.95 }}
+                transition={springSnappy}
+                className={`relative rounded-full px-4 py-2 text-[14px] tracking-[-0.224px] transition-colors duration-200 ${
+                  activeTab === cap.id ? "text-[#1d1d1f]" : "text-[#7a7a7a]"
+                }`}
+              >
+                {activeTab === cap.id && (
+                  <motion.span
+                    layoutId="heroTabPill"
+                    className="absolute inset-0 rounded-full bg-[#f5f5f7]"
+                    transition={springSoft}
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="relative z-10">{cap.label}</span>
+              </motion.button>
+            ))}
+            <span className="ml-auto hidden pr-3 font-mono text-[12px] text-[#7a7a7a] sm:block">{active.file}</span>
+          </div>
+
+          <div className="relative min-h-[268px] bg-[#fafafc] px-5 py-5 sm:px-7 sm:py-6">
+            <AnimatePresence mode="wait">
+              <motion.pre
+                key={active.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-x-auto font-mono text-[12px] leading-[1.85] tracking-normal sm:text-[13px]"
+              >
+                <code>
+                  {active.lines.map((line, i) => (
+                    <span key={i} className="flex gap-4">
+                      <span className="w-4 shrink-0 select-none text-right text-[#c7c7cc]">{i + 1}</span>
+                      <span className="whitespace-pre text-[#1d1d1f]">
+                        {line.length === 0
+                          ? " "
+                          : line.map((token, j) => (
+                              <span key={j} className={token.tone ? TONE_CLASS[token.tone] : undefined}>
+                                {token.text}
+                              </span>
+                            ))}
+                      </span>
+                    </span>
+                  ))}
+                </code>
+              </motion.pre>
+            </AnimatePresence>
+          </div>
+
+          <div className="flex items-center gap-2.5 border-t border-[#f0f0f0] bg-white px-5 py-4 sm:px-7">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0066cc]" aria-hidden="true" />
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={active.id}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 6 }}
+                transition={{ duration: 0.18 }}
+                className="caption text-[#333333]"
+              >
+                {active.caption}
+              </motion.p>
+            </AnimatePresence>
+          </div>
         </motion.div>
 
         <motion.div
-          className="flex items-center gap-10 bg-white/5 px-8 py-4 rounded-3xl border border-white/5 backdrop-blur-sm z-10 hover:border-primary/20 transition-all shadow-[0_0_30px_rgba(0,0,0,0.3)]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
+          className="mt-10 flex items-center gap-2"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...springSoft, delay: 0.7 }}
         >
-          <a href="https://github.com/aniigupta" target="_blank" rel="noreferrer" aria-label="GitHub Profile" className="text-muted-foreground hover:text-white transition-all transform hover:scale-125 hover:-translate-y-1"><Github className="w-6 h-6" /></a>
-          <a href="https://www.linkedin.com/in/aniket-gupta-564758226/" target="_blank" rel="noreferrer" aria-label="LinkedIn Profile" className="text-muted-foreground hover:text-white transition-all transform hover:scale-125 hover:-translate-y-1"><Linkedin className="w-6 h-6" /></a>
-          <a href="mailto:aniiigupta23@gmail.com" aria-label="Email Me" className="text-muted-foreground hover:text-white transition-all transform hover:scale-125 hover:-translate-y-1"><Mail className="w-6 h-6" /></a>
+          {[
+            { Icon: Github, href: "https://github.com/aniigupta", label: "GitHub Profile", external: true },
+            { Icon: Linkedin, href: "https://www.linkedin.com/in/aniket-gupta-564758226/", label: "LinkedIn Profile", external: true },
+            { Icon: Mail, href: "mailto:aniiigupta23@gmail.com", label: "Email Me", external: false },
+          ].map(({ Icon, href, label, external }) => (
+            <motion.a
+              key={label}
+              href={href}
+              aria-label={label}
+              {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:text-[#0066cc]"
+              whileTap={{ scale: 0.95 }}
+              transition={springSnappy}
+            >
+              <Icon className="h-[18px] w-[18px]" />
+            </motion.a>
+          ))}
         </motion.div>
       </div>
     </section>

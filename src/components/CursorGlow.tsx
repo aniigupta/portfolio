@@ -1,64 +1,67 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
+// Subscribe to the pointer capability directly - the server snapshot is `false`,
+// so the cursor never renders during SSR and there is no hydration mismatch.
+const HOVER_QUERY = "(hover: hover)";
+
+const subscribeToHover = (onChange: () => void) => {
+  const mediaQuery = window.matchMedia(HOVER_QUERY);
+  mediaQuery.addEventListener("change", onChange);
+  return () => mediaQuery.removeEventListener("change", onChange);
+};
+
 export default function CursorGlow() {
-  const [mounted, setMounted] = useState(false);
-  const [hasHover, setHasHover] = useState(false);
+  const hasHover = useSyncExternalStore(
+    subscribeToHover,
+    () => window.matchMedia(HOVER_QUERY).matches,
+    () => false
+  );
+  const [isInteractive, setIsInteractive] = useState(false);
 
   // High-performance Framer Motion values (bypasses React Render Cycle entirely to fix INP)
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
-  // Physics-based spring interpolators
-  const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
+  // Physics-based spring interpolator for the trailing ring
+  const springConfig = { damping: 18, stiffness: 220, mass: 0.15 };
   const smoothX = useSpring(cursorX, springConfig);
   const smoothY = useSpring(cursorY, springConfig);
 
-  // Gentle delayed spring for the ambient background glow
-  const bgSpringConfig = { damping: 30, stiffness: 50, mass: 1 };
-  const bgX = useSpring(cursorX, bgSpringConfig);
-  const bgY = useSpring(cursorY, bgSpringConfig);
-
   useEffect(() => {
-    setMounted(true);
-
-    // Detect if device supports a hover state (mouse/trackpad vs touch screen)
-    const mediaQuery = window.matchMedia("(hover: hover)");
-    setHasHover(mediaQuery.matches);
-    const handler = (e: MediaQueryListEvent) => setHasHover(e.matches);
-    mediaQuery.addEventListener("change", handler);
-
     const updateMousePosition = (e: MouseEvent) => {
       // Direct variable mutation! No React re-rendering triggered.
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
+
+      // Expand the ring over anything clickable
+      const target = e.target as Element | null;
+      setIsInteractive(Boolean(target?.closest?.("a, button, input, textarea, select, [role='option']")));
     };
     // Adding passive: true immediately improves scrolling performance further
     window.addEventListener("mousemove", updateMousePosition, { passive: true });
-    
+
     return () => {
-      mediaQuery.removeEventListener("change", handler);
       window.removeEventListener("mousemove", updateMousePosition);
     };
   }, [cursorX, cursorY]);
 
-  if (!mounted || !hasHover) return null;
+  if (!hasHover) return null;
 
   return (
     <>
       <motion.div
-        className="fixed top-[-16px] left-[-16px] w-8 h-8 rounded-full border border-primary/50 pointer-events-none z-[100] mix-blend-difference hidden md:block"
+        className="pointer-events-none fixed left-[-18px] top-[-18px] z-[100] hidden h-9 w-9 rounded-full border border-[#1d1d1f]/25 md:block"
         style={{ x: smoothX, y: smoothY }}
+        animate={{ scale: isInteractive ? 1.45 : 1, opacity: isInteractive ? 1 : 0.7 }}
+        transition={{ type: "spring", stiffness: 300, damping: 22 }}
       />
       <motion.div
-        className="fixed top-[-4px] left-[-4px] w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(139,92,246,0.8)] pointer-events-none z-[100] mix-blend-screen hidden md:block"
+        className="pointer-events-none fixed left-[-3px] top-[-3px] z-[100] hidden h-1.5 w-1.5 rounded-full bg-[#1d1d1f] md:block"
         style={{ x: cursorX, y: cursorY }}
-      />
-      {/* Background ambient glow matching the cursor */}
-      <motion.div
-        className="fixed top-[-400px] left-[-400px] w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.08),transparent_50%)] pointer-events-none -z-10 blur-[100px] hidden md:block"
-        style={{ x: bgX, y: bgY }}
+        animate={{ scale: isInteractive ? 0 : 1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 28 }}
       />
     </>
   );

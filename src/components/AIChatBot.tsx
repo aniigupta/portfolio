@@ -1,49 +1,65 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, Bot, User, Sparkles } from "lucide-react";
+import { MessageSquare, X, Send, Bot } from "lucide-react";
+import { springSnappy, springSoft } from "../lib/motion";
 
 type Message = { id: number; text: string; sender: "bot" | "user" };
 
+const neverChanges = () => () => {};
+
+// The greeting depends on sessionStorage, which only exists on the client.
+// Reading it through a cached snapshot keeps the first bubble stable across
+// re-renders (it must not rewrite itself once the visitor gives their name).
+let greetingSnapshot: Message[] | null = null;
+
+const getClientGreeting = (): Message[] => {
+  if (!greetingSnapshot) {
+    const savedName = sessionStorage.getItem("visitor_name");
+    greetingSnapshot = [
+      {
+        id: 1,
+        text: savedName
+          ? `Hi ${savedName}! I'm Aniket's AI assistant. Want to know about his tech stack, experience, or latest projects?`
+          : "Hi! I'm Aniket's AI assistant. What is your name?",
+        sender: "bot",
+      },
+    ];
+  }
+  return greetingSnapshot;
+};
+
+const NO_GREETING: Message[] = [];
+
 export default function AIChatBot() {
-  const [mounted, setMounted] = useState(false);
+  const greeting = useSyncExternalStore(neverChanges, getClientGreeting, () => NO_GREETING);
+  const mounted = greeting.length > 0;
+
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [thread, setThread] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const messages = [...greeting, ...thread];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    setMounted(true);
-    const savedName = sessionStorage.getItem("visitor_name");
-    if (savedName) {
-      setMessages([
-        { id: 1, text: `Hi ${savedName}! I'm Aniket's AI assistant. Want to know about his tech stack, experience, or latest projects?`, sender: "bot" }
-      ]);
-    } else {
-      setMessages([
-        { id: 1, text: "Hi! I'm Aniket's AI assistant. What is your name?", sender: "bot" }
-      ]);
-    }
-  }, []);
-
-  useEffect(() => {
     if (mounted) {
       scrollToBottom();
     }
-  }, [messages, isTyping, mounted]);
+  }, [thread, isTyping, mounted]);
 
   if (!mounted) return null;
 
   const handleSend = async () => {
     if (!inputVal.trim()) return;
-    
+
     const userMsg: Message = { id: Date.now(), text: inputVal, sender: "user" };
-    setMessages(prev => [...prev, userMsg]);
+    setThread(prev => [...prev, userMsg]);
     setInputVal("");
     setIsTyping(true);
 
@@ -69,25 +85,25 @@ export default function AIChatBot() {
         }).catch(() => {});
 
         const botResponse = `Nice to meet you, ${nameInput}! 😊 I can help you learn about Aniket's experience, tech stack, or projects. What would you like to know?`;
-        setMessages(prev => [...prev, { id: Date.now() + 1, text: botResponse, sender: "bot" }]);
+        setThread(prev => [...prev, { id: Date.now() + 1, text: botResponse, sender: "bot" }]);
         setIsTyping(false);
         return;
       }
 
       let botResponse = "I'm currently running in static mode, but Aniket specializes in Next.js, FastAPI, and building scalable full-stack applications. Would you like to shoot him an email to chat directly?";
-      
+
       const lower = userMsg.text.toLowerCase();
       if (lower.includes("experience") || lower.includes("work")) {
         botResponse = "Aniket works as a Full Stack Developer at Anarish Innovations, and previously built a production FOIA AI extraction pipeline at Naarivo Creations!";
       } else if (lower.includes("stack") || lower.includes("skills") || lower.includes("tech")) {
-        botResponse = "His core stack includes React/Next.js and Angular on the frontend, heavily paired with Node.js, FastAPI, and PostgreSQL on the backend. He also integrates LLMs heavily in his workflows!";
+        botResponse = "His core stack includes React/Next.js and Angular on the frontend, heavily paired with Node.js, Express, FastAPI, and PostgreSQL on the backend. He also builds LLM automation pipelines and RAG chatbots, and ships with Docker, Railway and Render.";
       } else if (lower.includes("project") || lower.includes("build")) {
-        botResponse = "Take a look at AtEats (a high-performance MERN food platform) or his upcoming SaaS Aura, an AI Stylist! Scroll to the Case Studies section for deep dives.";
+        botResponse = "He built AuraHRMS (a multi-module HRMS with RBAC and a RAG-based HR chatbot) and AtEats (a MERN food ordering platform with Stripe payments) end to end - see the Selected Work section. At Anarish he also shipped the IMS SaaS platform, Servitium CRM and Ops Suite Global, listed under Experience.";
       } else if (lower.includes("hire") || lower.includes("contract") || lower.includes("freelance")) {
-         botResponse = "He's currently open for new opportunities! You can book a 15-minute call using the button in the Contact Section, or email directly at aniiigupta23@gmail.com.";
+         botResponse = "He's currently open for new opportunities! You can book a 15-minute call using the button in the Contact Section, email aniiigupta23@gmail.com, or call +91 80762 06264.";
       }
 
-      setMessages(prev => [...prev, { id: Date.now() + 1, text: botResponse, sender: "bot" }]);
+      setThread(prev => [...prev, { id: Date.now() + 1, text: botResponse, sender: "bot" }]);
       setIsTyping(false);
     }, 1200);
   };
@@ -100,15 +116,16 @@ export default function AIChatBot() {
           <motion.button
             type="button"
             aria-label="Open AI chat assistant"
-            className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-[0_10px_40px_rgba(139,92,246,0.4)] z-50 hover:scale-110 active:scale-95 transition-transform"
+            className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#0066cc] text-white lg:bottom-10 lg:right-10"
             onClick={() => setIsOpen(true)}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            whileHover={{ y: -5 }}
+            whileTap={{ scale: 0.95 }}
+            transition={springSnappy}
           >
-            <MessageSquare className="text-white w-6 h-6" aria-hidden="true" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-[#030014] animate-pulse" aria-hidden="true"></span>
+            <MessageSquare className="h-6 w-6" aria-hidden="true" />
+            <span className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#30d158]" aria-hidden="true"></span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -117,62 +134,66 @@ export default function AIChatBot() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 w-80 sm:w-96 bg-[#0a0a1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] z-50 overflow-hidden flex flex-col"
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-6 right-6 z-50 flex w-80 flex-col overflow-hidden rounded-[18px] border border-black/[0.08] bg-white sm:w-96 lg:bottom-10 lg:right-10"
+            initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9, transition: { duration: 0.2 } }}
+            exit={{ opacity: 0, y: 40, scale: 0.96, transition: { duration: 0.2 } }}
+            transition={springSoft}
             style={{ height: '500px', maxHeight: '80vh' }}
             role="dialog"
             aria-labelledby="ai-chat-title"
           >
-            {/* Header */}
-            <div className="bg-primary/10 border-b border-primary/20 p-4 flex justify-between items-center shrink-0">
+            {/* Header - frosted parchment, matching the sub-nav grammar */}
+            <div className="flex shrink-0 items-center justify-between border-b border-[#f0f0f0] bg-[rgba(245,245,247,0.85)] p-4 backdrop-blur-xl">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center relative">
-                  <Bot className="w-4 h-4 text-primary" />
-                  <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-green-500 border border-[#0a0a1a]"></span>
+                <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1d1d1f]">
+                  <Bot className="h-4 w-4" />
+                  <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#30d158]"></span>
                 </div>
                 <div>
-                  <h3 id="ai-chat-title" className="font-bold text-sm text-white flex items-center gap-1">Ask AI <Sparkles className="w-3 h-3 text-yellow-400" /></h3>
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold">Online</p>
+                  <h3 id="ai-chat-title" className="caption-strong text-[#1d1d1f]">Ask AI</h3>
+                  <p className="fine-print text-[#7a7a7a]">Online</p>
                 </div>
               </div>
-              <button 
+              <motion.button
                 type="button"
                 aria-label="Close AI chat assistant"
                 onClick={() => setIsOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#7a7a7a] transition-colors hover:text-[#1d1d1f]"
+                whileTap={{ scale: 0.95 }}
+                transition={springSnappy}
               >
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
+                <X className="h-4 w-4" />
+              </motion.button>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scroller">
+            <div className="scroller flex-1 space-y-3 overflow-y-auto bg-white p-4">
               {messages.map((msg) => (
-                <div key={msg.id} className={`flex gap-3 ${msg.sender === "user" ? "flex-row-reverse" : ""}`}>
-                  <div className={`w-8 h-8 rounded-full flex shrink-0 items-center justify-center ${msg.sender === "user" ? "bg-white/10" : "bg-primary/20"}`}>
-                    {msg.sender === "user" ? <User className="w-4 h-4 text-gray-300" /> : <Bot className="w-4 h-4 text-primary" />}
-                  </div>
-                  <div className={`p-3 rounded-2xl max-w-[75%] text-sm leading-relaxed ${
-                    msg.sender === "user" 
-                      ? "bg-primary/20 text-white rounded-tr-sm border border-primary/10" 
-                      : "bg-white/5 text-gray-300 rounded-tl-sm border border-white/5"
-                  }`}>
+                <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[78%] rounded-[18px] px-4 py-2.5 text-[15px] leading-[1.4] tracking-[-0.01em] ${
+                      msg.sender === "user"
+                        ? "bg-[#0066cc] text-white"
+                        : "bg-[#f5f5f7] text-[#1d1d1f]"
+                    }`}
+                  >
                     {msg.text}
                   </div>
                 </div>
               ))}
-              
+
               {isTyping && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex shrink-0 items-center justify-center">
-                    <Bot className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="p-4 bg-white/5 rounded-2xl rounded-tl-sm border border-white/5 flex gap-1 items-center">
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                    <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                <div className="flex justify-start">
+                  <div className="flex items-center gap-1 rounded-[18px] bg-[#f5f5f7] px-4 py-3.5">
+                    {[0, 0.2, 0.4].map((delay) => (
+                      <motion.span
+                        key={delay}
+                        animate={{ y: [0, -4, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.6, delay }}
+                        className="h-1.5 w-1.5 rounded-full bg-[#7a7a7a]"
+                      />
+                    ))}
                   </div>
                 </div>
               )}
@@ -180,7 +201,7 @@ export default function AIChatBot() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-white/5 border-t border-white/5 shrink-0">
+            <div className="shrink-0 border-t border-[#f0f0f0] bg-white p-3">
               <div className="relative flex items-center">
                 <label htmlFor="chat-message" className="sr-only">Type your message</label>
                 <input
@@ -191,20 +212,21 @@ export default function AIChatBot() {
                   onChange={(e) => setInputVal(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Ask anything..."
-                  className="w-full bg-[#030014] border border-white/10 rounded-full py-3 pl-4 pr-12 text-sm outline-none focus:border-primary/50 transition-colors placeholder:text-gray-600"
+                  className="field-input rounded-full py-2.5 pl-4 pr-12 text-[15px]"
                 />
-                <button 
+                <motion.button
                   type="button"
                   aria-label="Send message"
                   onClick={handleSend}
                   disabled={!inputVal.trim() || isTyping}
-                  className="absolute right-2 w-8 h-8 rounded-full bg-primary/20 hover:bg-primary text-primary hover:text-white flex items-center justify-center transition-all disabled:opacity-50 disabled:hover:bg-primary/20 disabled:hover:text-primary"
+                  className="absolute right-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-[#0066cc] text-white transition-opacity disabled:opacity-40"
+                  whileTap={{ scale: 0.95 }}
+                  transition={springSnappy}
                 >
-                  <Send className="w-4 h-4 translate-x-[-1px] translate-y-[1px]" />
-                </button>
+                  <Send className="h-3.5 w-3.5 translate-x-[-1px]" />
+                </motion.button>
               </div>
             </div>
-            
           </motion.div>
         )}
       </AnimatePresence>
