@@ -1,7 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import { Brain, Database, Globe, Layout, Terminal, Wrench } from "lucide-react";
-import { chipIn, fadeUp, staggerChips, staggerContainer, viewportOnce } from "../lib/motion";
+import { chipIn, fadeUp, riseIn, staggerChips, staggerContainer, viewportOnce } from "../lib/motion";
+import RevealHeading from "./ui/RevealHeading";
+import SpotlightCard from "./ui/SpotlightCard";
 
 export default function SkillsSection() {
   const categories = [
@@ -24,7 +26,7 @@ export default function SkillsSection() {
           viewport={viewportOnce}
         >
           <span className="eyebrow mb-3">Expertise</span>
-          <h2 className="display-lg text-[#1d1d1f]">Technical arsenal.</h2>
+          <RevealHeading text="Technical arsenal." className="display-lg text-[#1d1d1f]" />
         </motion.div>
 
         <motion.div
@@ -35,9 +37,9 @@ export default function SkillsSection() {
           viewport={viewportOnce}
         >
           {categories.map((cat) => (
-            <motion.div key={cat.label} variants={fadeUp} className="surface-card p-6">
+            <SpotlightCard key={cat.label} variants={riseIn} className="surface-card group p-6">
               <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#f5f5f7] text-[#1d1d1f]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#f5f5f7] text-[#1d1d1f] transition-transform duration-500 ease-out group-hover:scale-110">
                   <cat.icon className="h-[18px] w-[18px]" />
                 </div>
                 <h3 className="caption-strong text-[#1d1d1f]">{cat.label}</h3>
@@ -56,7 +58,7 @@ export default function SkillsSection() {
                   </motion.span>
                 ))}
               </motion.div>
-            </motion.div>
+            </SpotlightCard>
           ))}
         </motion.div>
       </div>

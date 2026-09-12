@@ -1,8 +1,20 @@
 "use client";
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useState, type PointerEvent } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { Download, Github, Linkedin, Mail } from "lucide-react";
 import { springSnappy, springSoft } from "../lib/motion";
+import { useParallax } from "../lib/useParallax";
+import Magnetic from "./ui/Magnetic";
+
+/** Lets the hero reveal ride the intro curtain up rather than play behind it. */
+const INTRO = 0.3;
 
 type Token = { text: string; tone?: "keyword" | "string" | "fn" | "comment" | "punct" | "prop" };
 
@@ -168,30 +180,51 @@ export default function InteractiveHero() {
   const [activeTab, setActiveTab] = useState(CAPABILITIES[0].id);
   const active = CAPABILITIES.find((cap) => cap.id === activeTab) ?? CAPABILITIES[0];
 
+  const prefersReducedMotion = useReducedMotion();
+  const { ref: parallaxRef, y: parallaxY } = useParallax(34);
+
+  // Feather-light pointer tilt on the showcase card - 5 degrees at the corners.
+  const tiltX = useSpring(useMotionValue(0), { stiffness: 180, damping: 22 });
+  const tiltY = useSpring(useMotionValue(0), { stiffness: 180, damping: 22 });
+  const rotateX = useTransform(tiltX, [-0.5, 0.5], ["5deg", "-5deg"]);
+  const rotateY = useTransform(tiltY, [-0.5, 0.5], ["-5deg", "5deg"]);
+
+  const handleCardTilt = (event: PointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion || event.pointerType !== "mouse") return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    tiltX.set((event.clientY - rect.top) / rect.height - 0.5);
+    tiltY.set((event.clientX - rect.left) / rect.width - 0.5);
+  };
+
+  const resetCardTilt = () => {
+    tiltX.set(0);
+    tiltY.set(0);
+  };
+
   return (
     <section className="tile tile-light flex min-h-[92vh] flex-col items-center justify-center pt-32 md:pt-36">
       <div className="tile-inner flex flex-col items-center text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ ...springSoft, delay: 0.05 }}
+          transition={{ ...springSoft, delay: INTRO + 0.05 }}
           className="mb-8 inline-flex items-center gap-2.5 rounded-full bg-[#f5f5f7] py-1.5 pl-3 pr-4"
         >
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#30d158] opacity-75"></span>
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#30d158]"></span>
           </span>
-          <span className="caption text-[#333333]">Available for Q2/Q3 projects</span>
+          <span className="caption text-[#333333]">Open to full-time roles and freelance projects</span>
         </motion.div>
 
         <h1 className="hero-display mb-6 max-w-4xl text-[#1d1d1f]">
           {HEADLINE.map((word, i) => (
             <span key={word} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
               <motion.span
-                className="inline-block"
-                initial={{ y: "105%", opacity: 0 }}
-                animate={{ y: "0%", opacity: 1 }}
-                transition={{ type: "spring", stiffness: 220, damping: 26, delay: 0.08 + i * 0.07 }}
+                className="inline-block will-change-transform"
+                initial={{ y: "108%" }}
+                animate={{ y: "0%" }}
+                transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: INTRO + 0.08 + i * 0.075 }}
               >
                 {word}
               </motion.span>
@@ -204,7 +237,7 @@ export default function InteractiveHero() {
           className="lead mb-9 max-w-2xl text-balance text-[#1d1d1f]"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springSoft, delay: 0.42 }}
+          transition={{ ...springSoft, delay: INTRO + 0.42 }}
         >
           Full stack engineering for high-performance web applications and AI-integrated systems.
         </motion.p>
@@ -213,29 +246,43 @@ export default function InteractiveHero() {
           className="mb-16 flex flex-wrap items-center justify-center gap-4"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springSoft, delay: 0.52 }}
+          transition={{ ...springSoft, delay: INTRO + 0.52 }}
         >
-          <motion.a href="#projects" className="btn-primary" whileTap={{ scale: 0.95 }} transition={springSnappy}>
-            View case studies
-          </motion.a>
-          <motion.a
-            href="/Aniket_Kumar_Gupta_Resume.pdf"
-            download="Aniket_Kumar_Gupta_Resume.pdf"
-            className="btn-secondary"
-            whileTap={{ scale: 0.95 }}
-            transition={springSnappy}
-          >
-            <Download className="h-4 w-4" />
-            Resume
-          </motion.a>
+          <Magnetic strength={0.4} max={12}>
+            <motion.a href="#projects" className="btn-primary" whileTap={{ scale: 0.95 }} transition={springSnappy}>
+              View case studies
+            </motion.a>
+          </Magnetic>
+          <Magnetic strength={0.4} max={12}>
+            <motion.a
+              href="/Aniket_Kumar_Gupta_Resume.pdf"
+              download="Aniket_Kumar_Gupta_Resume.pdf"
+              className="btn-secondary group"
+              whileTap={{ scale: 0.95 }}
+              transition={springSnappy}
+            >
+              <Download className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-y-0.5" />
+              Resume
+            </motion.a>
+          </Magnetic>
         </motion.div>
 
-        {/* Interactive capability showcase - the artifact this tile is built around */}
+        {/* Interactive capability showcase - the artifact this tile is built around.
+            Entrance, scroll parallax and pointer tilt each own their own layer so
+            the transforms never fight over the same motion value. */}
         <motion.div
-          className="w-full max-w-3xl overflow-hidden rounded-[18px] border border-black/[0.08] bg-white text-left"
+          ref={parallaxRef}
+          className="w-full max-w-3xl"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springSoft, delay: 0.6 }}
+          transition={{ ...springSoft, delay: INTRO + 0.6 }}
+        >
+        <motion.div style={{ y: parallaxY }}>
+        <motion.div
+          onPointerMove={handleCardTilt}
+          onPointerLeave={resetCardTilt}
+          style={{ rotateX, rotateY, transformPerspective: 1200 }}
+          className="w-full overflow-hidden rounded-[18px] border border-black/[0.08] bg-white text-left will-change-transform"
         >
           <div className="flex items-center gap-1 border-b border-[#f0f0f0] p-2">
             {CAPABILITIES.map((cap) => (
@@ -310,29 +357,32 @@ export default function InteractiveHero() {
             </AnimatePresence>
           </div>
         </motion.div>
+        </motion.div>
+        </motion.div>
 
         <motion.div
           className="mt-10 flex items-center gap-2"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springSoft, delay: 0.7 }}
+          transition={{ ...springSoft, delay: INTRO + 0.7 }}
         >
           {[
             { Icon: Github, href: "https://github.com/aniigupta", label: "GitHub Profile", external: true },
             { Icon: Linkedin, href: "https://www.linkedin.com/in/aniket-gupta-564758226/", label: "LinkedIn Profile", external: true },
             { Icon: Mail, href: "mailto:aniiigupta23@gmail.com", label: "Email Me", external: false },
           ].map(({ Icon, href, label, external }) => (
-            <motion.a
-              key={label}
-              href={href}
-              aria-label={label}
-              {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:text-[#0066cc]"
-              whileTap={{ scale: 0.95 }}
-              transition={springSnappy}
-            >
-              <Icon className="h-[18px] w-[18px]" />
-            </motion.a>
+            <Magnetic key={label} strength={0.45} max={9}>
+              <motion.a
+                href={href}
+                aria-label={label}
+                {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-[#eaeaee] hover:text-[#0066cc]"
+                whileTap={{ scale: 0.95 }}
+                transition={springSnappy}
+              >
+                <Icon className="h-[18px] w-[18px]" />
+              </motion.a>
+            </Magnetic>
           ))}
         </motion.div>
       </div>

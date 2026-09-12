@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import Navbar from "../components/Navbar";
 import InteractiveHero from "../components/InteractiveHero";
+import PageLoader from "../components/PageLoader";
 
 
 // Dynamic Imports for below-the-fold content to drastically improve LCP & TTFB
@@ -20,6 +21,7 @@ const VisitorTracker = dynamic(() => import("../components/VisitorTracker"));
 export default function Home() {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden bg-white text-[#1d1d1f] selection:bg-[#0066cc]/15 scroller">
+      <PageLoader />
       <VisitorTracker />
       <CursorGlow />
 

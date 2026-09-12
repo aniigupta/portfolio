@@ -1,7 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
 import { Check, Globe, Zap } from "lucide-react";
-import { fadeUp, springSnappy, staggerContainer, viewportOnce } from "../lib/motion";
+import { fadeUp, riseIn, springSnappy, staggerContainer, viewportOnce } from "../lib/motion";
+import RevealHeading from "./ui/RevealHeading";
+import SpotlightCard from "./ui/SpotlightCard";
+import Magnetic from "./ui/Magnetic";
 
 export default function ProjectsSection() {
   // Products built end to end and owned outright. Client work shipped at
@@ -56,7 +59,7 @@ export default function ProjectsSection() {
             viewport={viewportOnce}
           >
             <span className="eyebrow mb-3">Selected work</span>
-            <h2 className="display-lg mb-4 text-[#1d1d1f]">Products I built end to end.</h2>
+            <RevealHeading text="Products I built end to end." className="display-lg mb-4 text-[#1d1d1f]" />
             <p className="lead text-[#333333]">
               Full platforms taken from schema design to production - architecture, APIs, interface and deployment.
             </p>
@@ -70,7 +73,7 @@ export default function ProjectsSection() {
             viewport={viewportOnce}
           >
             {builds.map((build) => (
-              <motion.div key={build.name} variants={fadeUp} className="surface-card flex flex-col p-8">
+              <SpotlightCard key={build.name} variants={riseIn} className="surface-card flex flex-col p-8">
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
                     <h3 className="tagline text-[#1d1d1f]">{build.name}</h3>
@@ -99,19 +102,21 @@ export default function ProjectsSection() {
                 </div>
 
                 {build.link && (
-                  <motion.a
-                    href={build.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`View the live ${build.name} demo`}
-                    className="btn-primary mt-7 w-fit"
-                    whileTap={{ scale: 0.95 }}
-                    transition={springSnappy}
-                  >
-                    Live demo
-                  </motion.a>
+                  <Magnetic className="mt-7 w-fit" strength={0.4} max={11}>
+                    <motion.a
+                      href={build.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`View the live ${build.name} demo`}
+                      className="btn-primary"
+                      whileTap={{ scale: 0.95 }}
+                      transition={springSnappy}
+                    >
+                      Live demo
+                    </motion.a>
+                  </Magnetic>
                 )}
-              </motion.div>
+              </SpotlightCard>
             ))}
           </motion.div>
         </div>
@@ -128,7 +133,7 @@ export default function ProjectsSection() {
             viewport={viewportOnce}
           >
             <span className="eyebrow mb-3">Building in public</span>
-            <h2 className="display-lg text-[#1d1d1f]">Upcoming products.</h2>
+            <RevealHeading text="Upcoming products." className="display-lg text-[#1d1d1f]" />
           </motion.div>
 
           <motion.div
@@ -142,7 +147,7 @@ export default function ProjectsSection() {
               { name: "AI UI/UX Auditor", icon: Zap, desc: "A sophisticated analysis tool currently being built for Anarish.com that allows users to audit their website UI/UX by simply pasting a URL.", status: "In Progress" },
               { name: "TripCraft", icon: Globe, desc: "A smart trip planner utilizing generative AI to assemble personalized itineraries, integrating mapping data and cost optimizations instantly.", status: "MVP" }
             ].map((prod) => (
-              <motion.div key={prod.name} variants={fadeUp} className="surface-card p-8">
+              <SpotlightCard key={prod.name} variants={riseIn} className="surface-card p-8">
                 <div className="mb-7 flex items-start justify-between">
                   <div className="flex h-11 w-11 items-center justify-center rounded-[11px] bg-[#f5f5f7] text-[#1d1d1f]">
                     <prod.icon className="h-5 w-5" />
@@ -151,7 +156,7 @@ export default function ProjectsSection() {
                 </div>
                 <h3 className="tagline mb-2 text-[#1d1d1f]">{prod.name}</h3>
                 <p className="caption text-[#333333]">{prod.desc}</p>
-              </motion.div>
+              </SpotlightCard>
             ))}
           </motion.div>
         </div>

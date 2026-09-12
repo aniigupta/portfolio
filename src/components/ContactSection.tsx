@@ -2,7 +2,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Users, Mail, MapPin, Phone, Github, Linkedin, CalendarCheck, Code, ChevronDown, Check, X, AlertCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { fadeUp, springSnappy, springSoft, viewportOnce } from "../lib/motion";
+import { fadeUp, riseIn, springSnappy, springSoft, viewportOnce } from "../lib/motion";
+import RevealHeading from "./ui/RevealHeading";
+import Magnetic from "./ui/Magnetic";
 
 export default function ContactSection() {
   const [isOpen, setIsOpen] = useState(false);
@@ -164,7 +166,7 @@ export default function ContactSection() {
           viewport={viewportOnce}
         >
           <span className="eyebrow mb-3">Get in touch</span>
-          <h2 className="display-lg mb-4 text-[#1d1d1f]">Let&apos;s connect.</h2>
+          <RevealHeading text="Let's connect." className="display-lg mb-4 text-[#1d1d1f]" />
           <p className="lead mx-auto max-w-2xl text-[#333333]">
             Have a project in mind, need a full-stack architect, or just want to talk shop?
           </p>
@@ -247,18 +249,19 @@ export default function ContactSection() {
                   { Icon: Linkedin, href: "https://www.linkedin.com/in/aniket-gupta-564758226/", label: "LinkedIn Profile" },
                   { Icon: Mail, href: "mailto:aniiigupta23@gmail.com", label: "Send Email" }
                 ].map(({ Icon, href, label }) => (
-                  <motion.a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={label}
-                    className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:text-[#0066cc]"
-                    whileTap={{ scale: 0.95 }}
-                    transition={springSnappy}
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                  </motion.a>
+                  <Magnetic key={label} strength={0.45} max={9}>
+                    <motion.a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={label}
+                      className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-[#eaeaee] hover:text-[#0066cc]"
+                      whileTap={{ scale: 0.95 }}
+                      transition={springSnappy}
+                    >
+                      <Icon className="h-[18px] w-[18px]" />
+                    </motion.a>
+                  </Magnetic>
                 ))}
               </div>
             </motion.div>
@@ -268,7 +271,7 @@ export default function ContactSection() {
             <motion.form
               onSubmit={handleSubmit}
               className="surface-card space-y-7 p-8 md:p-10"
-              variants={fadeUp}
+              variants={riseIn}
               initial="hidden"
               whileInView="visible"
               viewport={viewportOnce}
@@ -396,12 +399,16 @@ export default function ContactSection() {
               <motion.button
                 type="submit"
                 disabled={status === "loading"}
-                className="btn-primary w-full py-3.5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary group w-full py-3.5 disabled:cursor-not-allowed disabled:opacity-50"
                 whileTap={{ scale: 0.95 }}
                 transition={springSnappy}
               >
                 {status === "loading" ? "Sending..." : "Send message"}
-                <Send className={`h-4 w-4 ${status === "loading" ? "animate-pulse" : ""}`} />
+                <Send
+                  className={`h-4 w-4 transition-transform duration-300 ease-out ${
+                    status === "loading" ? "animate-pulse" : "group-hover:translate-x-1 group-hover:-translate-y-0.5"
+                  }`}
+                />
               </motion.button>
             </motion.form>
           </div>

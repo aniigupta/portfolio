@@ -1,8 +1,13 @@
 "use client";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { GraduationCap, Github, Mail, Code2, Terminal, Cpu, Zap, ShieldCheck, Download, Check, ArrowUpRight } from "lucide-react";
-import { fadeUp, springSnappy, staggerContainer, viewportOnce } from "../lib/motion";
+import { easeEditorial, fadeUp, riseIn, springSnappy, staggerContainer, viewportOnce } from "../lib/motion";
+import { useGsapScroll } from "../lib/useGsapScroll";
+import RevealHeading from "./ui/RevealHeading";
+import SpotlightCard from "./ui/SpotlightCard";
+import Magnetic from "./ui/Magnetic";
 
 type Experience = {
   title: string;
@@ -60,6 +65,28 @@ export default function AboutSection() {
     }
   ];
 
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+
+  // The rail fills in step with the scroll position - GSAP's scrub is what makes
+  // this feel tied to the reader rather than triggered at them.
+  useGsapScroll(
+    ({ gsap }) => {
+      if (!railRef.current || !timelineRef.current) return;
+      gsap.to(railRef.current, {
+        scaleY: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: timelineRef.current,
+          start: "top 72%",
+          end: "bottom 68%",
+          scrub: 0.6,
+        },
+      });
+    },
+    { query: "(prefers-reduced-motion: no-preference) and (min-width: 768px)" }
+  );
+
   const principles = [
     { icon: Cpu, title: "Architecture First", desc: "I prioritize scalable schemas and modular Next.js/React code to ensure rapid feature delivery without technical debt." },
     { icon: Zap, title: "Performance Obsession", desc: "Obsessed with edge-caching, optimized asset delivery via Cloudinary, and minimizing database roundtrips." },
@@ -71,8 +98,8 @@ export default function AboutSection() {
       <div className="tile-inner">
         <motion.div className="mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
           <span className="eyebrow mb-3">Behind the code</span>
-          <h2 className="display-lg text-[#1d1d1f]">How I think and build.</h2>
         </motion.div>
+        <RevealHeading text="How I think and build." className="display-lg mb-12 text-[#1d1d1f]" />
 
         <motion.div
           className="mb-24 grid gap-5 md:grid-cols-3"
@@ -82,25 +109,28 @@ export default function AboutSection() {
           viewport={viewportOnce}
         >
           {principles.map((item) => (
-            <motion.div key={item.title} variants={fadeUp} className="surface-card p-6">
-              <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-[11px] bg-[#f5f5f7] text-[#1d1d1f]">
+            <SpotlightCard key={item.title} variants={riseIn} className="surface-card p-6">
+              <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-[11px] bg-[#f5f5f7] text-[#1d1d1f] transition-colors duration-300 group-hover:bg-white">
                 <item.icon className="h-5 w-5" />
               </div>
               <h3 className="tagline mb-2 text-[#1d1d1f]">{item.title}</h3>
               <p className="caption text-[#333333]">{item.desc}</p>
-            </motion.div>
+            </SpotlightCard>
           ))}
         </motion.div>
 
         <motion.div className="mb-12" variants={fadeUp} initial="hidden" whileInView="visible" viewport={viewportOnce}>
           <span className="eyebrow mb-3">Track record</span>
-          <h2 className="display-lg text-[#1d1d1f]">Experience and milestones.</h2>
         </motion.div>
+        <RevealHeading text="Experience and milestones." className="display-lg mb-12 text-[#1d1d1f]" />
 
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-          <div className="relative space-y-5 lg:col-span-7">
-            {/* Hairline rail - the timeline reads as structure, not decoration */}
-            <div className="absolute bottom-6 left-[19px] top-6 hidden w-px bg-[#e0e0e0] md:block" aria-hidden="true"></div>
+          <div ref={timelineRef} className="relative space-y-5 lg:col-span-7">
+            {/* Hairline rail - the timeline reads as structure, not decoration.
+                A second line rides on top, filling as the reader scrolls. */}
+            <div className="absolute bottom-6 left-[19px] top-6 hidden w-px bg-[#e0e0e0] md:block" aria-hidden="true">
+              <div ref={railRef} className="h-full w-full origin-top scale-y-0 bg-[#0066cc]"></div>
+            </div>
 
             {experiences.map((job, i) => (
               <motion.div
@@ -120,7 +150,7 @@ export default function AboutSection() {
                   </span>
                 </div>
 
-                <div className="surface-card p-6 md:p-8">
+                <SpotlightCard className="surface-card p-6 md:p-8" lift={false}>
                   <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h3 className="display-md text-[#1d1d1f]">{job.title}</h3>
@@ -168,61 +198,74 @@ export default function AboutSection() {
                       </span>
                     ))}
                   </div>
-                </div>
+                </SpotlightCard>
               </motion.div>
             ))}
           </div>
 
           <div className="space-y-5 lg:col-span-5">
             <motion.div
-              className="surface-card flex flex-col items-center p-8"
-              variants={fadeUp}
+              variants={riseIn}
               initial="hidden"
               whileInView="visible"
               viewport={viewportOnce}
             >
-              <div className="relative mb-5 h-28 w-28 overflow-hidden rounded-full">
-                <Image
-                  src="/profile.png"
-                  alt="Aniket Gupta - Software Engineer and AI Specialist Official Photo"
-                  fill
-                  sizes="112px"
-                  className="object-cover object-top"
-                />
-              </div>
-              <h3 className="tagline text-[#1d1d1f]">Aniket Gupta</h3>
-              <p className="caption mb-6 mt-1 text-[#7a7a7a]">Full Stack Developer</p>
-              <div className="flex gap-2.5">
-                <motion.a
-                  href="mailto:aniiigupta23@gmail.com"
-                  aria-label="Send an email to Aniket"
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:text-[#0066cc]"
-                  whileTap={{ scale: 0.95 }}
-                  transition={springSnappy}
-                >
-                  <Mail className="h-[18px] w-[18px]" />
-                </motion.a>
-                <motion.a
-                  href="https://github.com/aniigupta"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="View Aniket's GitHub profile"
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:text-[#0066cc]"
-                  whileTap={{ scale: 0.95 }}
-                  transition={springSnappy}
-                >
-                  <Github className="h-[18px] w-[18px]" />
-                </motion.a>
-              </div>
+              <SpotlightCard className="surface-card flex flex-col items-center p-8">
+                <div className="group relative mb-5 h-28 w-28 overflow-hidden rounded-full">
+                  <motion.div
+                    className="absolute inset-0"
+                    initial={{ scale: 1.24 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={viewportOnce}
+                    transition={{ duration: 1.1, ease: easeEditorial }}
+                  >
+                    <Image
+                      src="/profile.png"
+                      alt="Aniket Gupta - Software Engineer and AI Specialist Official Photo"
+                      fill
+                      sizes="112px"
+                      className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  </motion.div>
+                </div>
+                <h3 className="tagline text-[#1d1d1f]">Aniket Gupta</h3>
+                <p className="caption mb-6 mt-1 text-[#7a7a7a]">Full Stack Developer</p>
+                <div className="flex gap-2.5">
+                  <Magnetic strength={0.45} max={9}>
+                    <motion.a
+                      href="mailto:aniiigupta23@gmail.com"
+                      aria-label="Send an email to Aniket"
+                      className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-[#eaeaee] hover:text-[#0066cc]"
+                      whileTap={{ scale: 0.95 }}
+                      transition={springSnappy}
+                    >
+                      <Mail className="h-[18px] w-[18px]" />
+                    </motion.a>
+                  </Magnetic>
+                  <Magnetic strength={0.45} max={9}>
+                    <motion.a
+                      href="https://github.com/aniigupta"
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="View Aniket's GitHub profile"
+                      className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f5f5f7] text-[#1d1d1f] transition-colors hover:bg-[#eaeaee] hover:text-[#0066cc]"
+                      whileTap={{ scale: 0.95 }}
+                      transition={springSnappy}
+                    >
+                      <Github className="h-[18px] w-[18px]" />
+                    </motion.a>
+                  </Magnetic>
+                </div>
+              </SpotlightCard>
             </motion.div>
 
             <motion.div
-              className="surface-card p-8"
-              variants={fadeUp}
+              variants={riseIn}
               initial="hidden"
               whileInView="visible"
               viewport={viewportOnce}
             >
+            <SpotlightCard className="surface-card p-8" lift={false}>
               <div className="mb-7 flex items-center gap-4">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[11px] bg-[#f5f5f7] text-[#1d1d1f]">
                   <GraduationCap className="h-5 w-5" />
@@ -267,14 +310,15 @@ export default function AboutSection() {
                 <motion.a
                   href="/Aniket_Kumar_Gupta_Resume.pdf"
                   download="Aniket_Kumar_Gupta_Resume.pdf"
-                  className="btn-primary mt-2 w-full"
+                  className="btn-primary group mt-2 w-full"
                   whileTap={{ scale: 0.95 }}
                   transition={springSnappy}
                 >
                   Download Resume
-                  <Download className="h-4 w-4" />
+                  <Download className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-y-0.5" />
                 </motion.a>
               </div>
+            </SpotlightCard>
             </motion.div>
           </div>
         </div>

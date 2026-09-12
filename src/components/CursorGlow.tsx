@@ -19,6 +19,7 @@ export default function CursorGlow() {
     () => false
   );
   const [isInteractive, setIsInteractive] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
   // High-performance Framer Motion values (bypasses React Render Cycle entirely to fix INP)
   const cursorX = useMotionValue(-100);
@@ -39,11 +40,18 @@ export default function CursorGlow() {
       const target = e.target as Element | null;
       setIsInteractive(Boolean(target?.closest?.("a, button, input, textarea, select, [role='option']")));
     };
+    const handleDown = () => setIsPressed(true);
+    const handleUp = () => setIsPressed(false);
+
     // Adding passive: true immediately improves scrolling performance further
     window.addEventListener("mousemove", updateMousePosition, { passive: true });
+    window.addEventListener("mousedown", handleDown, { passive: true });
+    window.addEventListener("mouseup", handleUp, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", updateMousePosition);
+      window.removeEventListener("mousedown", handleDown);
+      window.removeEventListener("mouseup", handleUp);
     };
   }, [cursorX, cursorY]);
 
@@ -52,15 +60,19 @@ export default function CursorGlow() {
   return (
     <>
       <motion.div
-        className="pointer-events-none fixed left-[-18px] top-[-18px] z-[100] hidden h-9 w-9 rounded-full border border-[#1d1d1f]/25 md:block"
+        className="pointer-events-none fixed left-[-18px] top-[-18px] z-[100] hidden h-9 w-9 rounded-full border md:block"
         style={{ x: smoothX, y: smoothY }}
-        animate={{ scale: isInteractive ? 1.45 : 1, opacity: isInteractive ? 1 : 0.7 }}
+        animate={{
+          scale: isPressed ? 1.15 : isInteractive ? 1.5 : 1,
+          opacity: isInteractive ? 1 : 0.55,
+          borderColor: isInteractive ? "rgba(0, 102, 204, 0.55)" : "rgba(29, 29, 31, 0.28)",
+        }}
         transition={{ type: "spring", stiffness: 300, damping: 22 }}
       />
       <motion.div
         className="pointer-events-none fixed left-[-3px] top-[-3px] z-[100] hidden h-1.5 w-1.5 rounded-full bg-[#1d1d1f] md:block"
         style={{ x: cursorX, y: cursorY }}
-        animate={{ scale: isInteractive ? 0 : 1 }}
+        animate={{ scale: isInteractive ? 0 : isPressed ? 0.6 : 1 }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
       />
     </>

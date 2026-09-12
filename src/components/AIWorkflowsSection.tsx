@@ -1,7 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
 import { ArrowRight, Bot, Brain, Bug, Cpu, FileText, Layout, Search, Terminal, Workflow, Zap } from "lucide-react";
-import { chipIn, fadeUp, staggerChips, staggerContainer, viewportOnce } from "../lib/motion";
+import { chipIn, fadeUp, riseIn, staggerChips, staggerContainer, viewportOnce } from "../lib/motion";
+import RevealHeading from "./ui/RevealHeading";
+import SpotlightCard from "./ui/SpotlightCard";
 
 export default function AIWorkflowsSection() {
   const coreCapabilities = [
@@ -53,7 +55,7 @@ export default function AIWorkflowsSection() {
           viewport={viewportOnce}
         >
           <span className="eyebrow mb-3">Efficiency and velocity</span>
-          <h2 className="display-lg mb-5 text-white">Augmented engineering.</h2>
+          <RevealHeading text="Augmented engineering." className="display-lg mb-5 text-white" />
           <p className="body-copy text-[#cccccc]">
             I leverage a sophisticated AI stack as a force multiplier to bridge the gap between complex requirements
             and production-ready code. By integrating agentic workflows (Antigravity, Cursor) and advanced RAG-based
@@ -70,13 +72,13 @@ export default function AIWorkflowsSection() {
           viewport={viewportOnce}
         >
           {coreCapabilities.map((cap) => (
-            <motion.div key={cap.title} variants={fadeUp} className="surface-card p-8">
-              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-[11px] bg-white/[0.08] text-white">
+            <SpotlightCard key={cap.title} variants={riseIn} tone="dark" className="surface-card group p-8">
+              <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-[11px] bg-white/[0.08] text-white transition-colors duration-300 group-hover:bg-white/[0.14]">
                 <cap.icon className="h-5 w-5" />
               </div>
               <h3 className="tagline mb-3 text-white">{cap.title}</h3>
               <p className="caption text-[#cccccc]">{cap.desc}</p>
-            </motion.div>
+            </SpotlightCard>
           ))}
         </motion.div>
 
@@ -100,13 +102,13 @@ export default function AIWorkflowsSection() {
               viewport={viewportOnce}
             >
               {usageItems.map((item) => (
-                <motion.div key={item.label} variants={fadeUp} className="surface-card p-6">
+                <SpotlightCard key={item.label} variants={riseIn} tone="dark" className="surface-card group p-6">
                   <div className="mb-2.5 flex items-center gap-2.5">
-                    <item.icon className="h-4 w-4 text-[#2997ff]" />
+                    <item.icon className="h-4 w-4 text-[#2997ff] transition-transform duration-500 ease-out group-hover:scale-110" />
                     <span className="caption-strong text-white">{item.label}</span>
                   </div>
                   <p className="fine-print leading-relaxed text-[#cccccc]">{item.detail}</p>
-                </motion.div>
+                </SpotlightCard>
               ))}
             </motion.div>
           </motion.div>
@@ -118,7 +120,7 @@ export default function AIWorkflowsSection() {
             whileInView="visible"
             viewport={viewportOnce}
           >
-            <div className="surface-card p-8">
+            <SpotlightCard tone="dark" className="surface-card p-8" lift={false}>
               <h3 className="tagline mb-5 flex items-center gap-2.5 text-white">
                 <Zap className="h-5 w-5 text-[#2997ff]" /> The intelligence stack
               </h3>
@@ -166,7 +168,7 @@ export default function AIWorkflowsSection() {
                   ))}
                 </motion.ol>
               </div>
-            </div>
+            </SpotlightCard>
           </motion.div>
         </div>
       </div>
