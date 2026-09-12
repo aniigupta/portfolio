@@ -17,6 +17,7 @@ const Footer = dynamic(() => import("../components/Footer"));
 const CursorGlow = dynamic(() => import("../components/CursorGlow"));
 const AIChatBot = dynamic(() => import("../components/AIChatBot"));
 const VisitorTracker = dynamic(() => import("../components/VisitorTracker"));
+const VirtualPet = dynamic(() => import("../components/VirtualPet"));
 
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
       <PageLoader />
       <VisitorTracker />
       <CursorGlow />
+      <VirtualPet />
 
       <Navbar />
 
