@@ -419,6 +419,33 @@ body {
   border-radius: 10px;
 }
 
+/* ---------- Motion ---------- */
+
+/* A slow double-beat, transform only so it stays on the compositor.
+   The reduced-motion block below flattens it to a static glyph. */
+@keyframes heartbeat {
+  0%,
+  38%,
+  100% {
+    transform: scale(1);
+  }
+  8% {
+    transform: scale(1.16);
+  }
+  16% {
+    transform: scale(1);
+  }
+  24% {
+    transform: scale(1.1);
+  }
+}
+
+.heartbeat {
+  display: inline-block;
+  animation: heartbeat 3.2s ease-in-out infinite;
+  will-change: transform;
+}
+
 /* ---------- A11y ---------- */
 
 :where(a, button, input, textarea, select):focus-visible {

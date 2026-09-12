@@ -39,7 +39,11 @@ export default function Footer() {
 
         <div className="mt-10 border-t border-[#e0e0e0] pt-6">
           <p className="fine-print text-center text-[#7a7a7a] md:text-left">
-            Copyright © {new Date().getFullYear()} Aniket Kumar Gupta. Engineered in India.
+            Copyright © {new Date().getFullYear()} Aniket Kumar Gupta. Built with{" "}
+            <span className="heartbeat" role="img" aria-label="love">
+              ❤️
+            </span>{" "}
+            in India.
           </p>
         </div>
       </div>
